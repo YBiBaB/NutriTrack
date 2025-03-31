@@ -10,18 +10,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -74,6 +78,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             LoginScreen(navController = navController, context = context, modifier = Modifier.padding(innerPadding))
+                        }
+                        composable("questions") {
+                            QuestionScreen(navController = navController, context = context, modifier = Modifier.padding(innerPadding))
                         }
                     }
                 }
@@ -194,10 +201,54 @@ fun readCSVFile(context: Context, fileName: String):  Map<String, Map<String, St
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun DropDownBar(label: String, elements: List<String>, onSelectionChanged: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf("") }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange =  {expanded = it}
+    ) {
+        OutlinedTextField(
+            value = selected,
+            onValueChange = { selected = it },
+            placeholder = { Text(text = label) },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = null,
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            elements.forEach { element ->
+                DropdownMenuItem(
+                    text = {Text (element)},
+                    onClick = {
+                        selected = element
+                        onSelectionChanged(element)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun LoginScreen(navController: NavController, context: Context, modifier: Modifier = Modifier) {
     var selectedUserID by remember { mutableStateOf("") }
     var PhoneNumber by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
     var csvData by remember { mutableStateOf<Map<String, Map<String, String>>>(emptyMap()) }
     var userIDs = remember { mutableStateListOf<String>() }
 
@@ -234,43 +285,11 @@ fun LoginScreen(navController: NavController, context: Context, modifier: Modifi
                 modifier = Modifier.align(Alignment.Start),
             )
 
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange =  {expanded = it}
-            ) {
-                OutlinedTextField(
-                    value = selectedUserID,
-                    onValueChange = { selectedUserID = it },
-                    placeholder = { Text(text = "Select your ID") },
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(
-                                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                                contentDescription = null,
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    userIDs.forEach { userId ->
-                        DropdownMenuItem(
-                            text = {Text (userId)},
-                            onClick = {
-                                selectedUserID = userId
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
+            DropDownBar(
+                label = "Select your ID",
+                elements = userIDs,
+                onSelectionChanged = { selectedUserID = it }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -300,7 +319,7 @@ fun LoginScreen(navController: NavController, context: Context, modifier: Modifi
                     val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
                     if (userPhone != null && userPhone == PhoneNumber) {
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
-//                        context.startActivity(Intent(context, Dashboard::class.java))
+                        navController.navigate("questions")
                     } else {
                         Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
                     }
@@ -321,6 +340,196 @@ fun LoginScreen(navController: NavController, context: Context, modifier: Modifi
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+        }
+    }
+}
+
+@Composable
+fun QuestionScreen(navController: NavController, context: Context, modifier: Modifier) {
+    var isFruits by remember { mutableStateOf(false) }
+    var isVegetables by remember { mutableStateOf(false) }
+    var isGrains by remember { mutableStateOf(false) }
+    var isRedMeat by remember { mutableStateOf(false) }
+    var isSeafood by remember { mutableStateOf(false) }
+    var isPoultry by remember { mutableStateOf(false) }
+    var isFish by remember { mutableStateOf(false) }
+    var isEggs by remember { mutableStateOf(false) }
+    var isNutsSeeds by remember { mutableStateOf(false) }
+    var selectedLabel by remember { mutableStateOf("") }
+
+    @Composable
+    fun CustomButton(text: String, ) {
+        Button(
+            onClick = {},
+            modifier = Modifier
+                .wrapContentSize()
+                .height(55.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F29BD)),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+        ) {
+            Text(
+                text = text,
+                color = Color.White,
+            )
+        }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        Column(
+            modifier = Modifier
+//                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                "Tick all food categories you can eat",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = isFruits,
+                    onCheckedChange = {isFruits = it},
+                )
+                Text("Fruits")
+
+                Checkbox(
+                    checked = isVegetables,
+                    onCheckedChange = {isVegetables = it},
+                )
+                Text("Vegetables")
+
+                Checkbox(
+                    checked = isGrains,
+                    onCheckedChange = {isGrains = it},
+                )
+                Text("Grains")
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = isRedMeat,
+                    onCheckedChange = {isRedMeat = it},
+                )
+                Text("Red Meat")
+
+                Checkbox(
+                    checked = isSeafood,
+                    onCheckedChange = {isSeafood = it},
+                )
+                Text("Seafood")
+
+                Checkbox(
+                    checked = isPoultry,
+                    onCheckedChange = {isPoultry = it},
+                )
+                Text("Poultry")
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = isFish,
+                    onCheckedChange = {isFish = it},
+                )
+                Text("Fish")
+
+                Checkbox(
+                    checked = isEggs,
+                    onCheckedChange = {isEggs = it},
+                )
+                Text("Egg")
+
+                Checkbox(
+                    checked = isNutsSeeds,
+                    onCheckedChange = {isNutsSeeds = it},
+                )
+                Text("Nuts/Seeds")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "Your Persona",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Text(
+                "People can be broadly classified into 6 different types based on " +
+                        "their eating preferences. Click on each button below to find out " +
+                        "the different types, and select the type that best fits you!"
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val buttonLabels = listOf(
+                    "Health Devotee",
+                    "Mindful Eater",
+                    "Wellness Striver",
+                )
+                buttonLabels.forEach { label ->
+                    CustomButton(label)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val buttonLabels = listOf(
+                    "Balance Seeker",
+                    "Health Procrastinator",
+                    "Food carefree",
+                )
+                buttonLabels.forEach { label ->
+                    CustomButton(label)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                "Which persona best fits you?",
+            )
+
+            val buttonLabels = listOf(
+                "Health Devotee",
+                "Mindful Eater",
+                "Wellness Striver",
+                "Balance Seeker",
+                "Health Procrastinator",
+                "Food carefree",
+            )
+
+            DropDownBar(
+                label = "",
+                elements = buttonLabels,
+                onSelectionChanged = { selectedLabel = it },
+            )
 
         }
     }
