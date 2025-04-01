@@ -61,8 +61,6 @@ fun TopBar(
             .statusBarsPadding(),
     )
 
-//    Spacer(modifier = Modifier.height(12.dp))
-
     Divider(
         color = Color.LightGray,
         thickness = 1.dp,
