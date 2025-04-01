@@ -1,6 +1,7 @@
 package com.fit2081.fit2081a2.ui.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,21 +45,13 @@ import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.ui.components.TopBar
 
 @Composable
-fun QuestionScreen(navController: NavController, context: Context, modifier: Modifier) {
+fun QuestionScreen(
+    navController: NavController,
+    onSubmit: (result: MutableMap<String, Any>) -> Unit,
+    modifier: Modifier
+) {
     val scrollState = rememberScrollState()
-    var isFruits by remember { mutableStateOf(false) }
-    var isVegetables by remember { mutableStateOf(false) }
-    var isGrains by remember { mutableStateOf(false) }
-    var isRedMeat by remember { mutableStateOf(false) }
-    var isSeafood by remember { mutableStateOf(false) }
-    var isPoultry by remember { mutableStateOf(false) }
-    var isFish by remember { mutableStateOf(false) }
-    var isEggs by remember { mutableStateOf(false) }
-    var isNutsSeeds by remember { mutableStateOf(false) }
-    var selectedLabel by remember { mutableStateOf("") }
-    var mealTime by remember { mutableStateOf("") }
-    var sleepTime by remember { mutableStateOf("") }
-    var wakeTime by remember { mutableStateOf("") }
+    var userResponses by rememberSaveable { mutableStateOf(mutableMapOf<String, Any>()) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -83,73 +77,23 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
                 fontSize = 20.sp
             )
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = isFruits,
-                    onCheckedChange = {isFruits = it},
-                )
-                Text("Fruits")
+            val foodOptions = listOf("Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds")
 
-                Checkbox(
-                    checked = isVegetables,
-                    onCheckedChange = {isVegetables = it},
-                )
-                Text("Vegetables")
-
-                Checkbox(
-                    checked = isGrains,
-                    onCheckedChange = {isGrains = it},
-                )
-                Text("Grains")
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = isRedMeat,
-                    onCheckedChange = {isRedMeat = it},
-                )
-                Text("Red Meat")
-
-                Checkbox(
-                    checked = isSeafood,
-                    onCheckedChange = {isSeafood = it},
-                )
-                Text("Seafood")
-
-                Checkbox(
-                    checked = isPoultry,
-                    onCheckedChange = {isPoultry = it},
-                )
-                Text("Poultry")
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = isFish,
-                    onCheckedChange = {isFish = it},
-                )
-                Text("Fish")
-
-                Checkbox(
-                    checked = isEggs,
-                    onCheckedChange = {isEggs = it},
-                )
-                Text("Egg")
-
-                Checkbox(
-                    checked = isNutsSeeds,
-                    onCheckedChange = {isNutsSeeds = it},
-                )
-                Text("Nuts/Seeds")
+            foodOptions.chunked(3).forEach { rowItems ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    rowItems.forEach { food ->
+                        Checkbox(
+                            checked = userResponses[food] as? Boolean ?: false,
+                            onCheckedChange = { checked ->
+                                userResponses = userResponses.toMutableMap().apply { put(food, checked) }
+                            }
+                        )
+                        Text(food)
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -168,33 +112,19 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val buttonLabels = listOf(
-                    "Health Devotee",
-                    "Mindful Eater",
-                    "Wellness Striver",
-                )
-                buttonLabels.forEach { label ->
-                    CustomButton(label)
-                }
-            }
+            val personaTypes = listOf(
+                "Health Devotee", "Mindful Eater", "Wellness Striver",
+                "Balance Seeker", "Health Procrastinator", "Food Carefree"
+            )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val buttonLabels = listOf(
-                    "Balance Seeker",
-                    "Health Procrastinator",
-                    "Food carefree",
-                )
-                buttonLabels.forEach { label ->
-                    CustomButton(label)
+            personaTypes.chunked(3).forEach { rowItems ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    rowItems.forEach { label ->
+                        CustomButton(label)
+                    }
                 }
             }
 
@@ -216,7 +146,7 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
             DropDownBar(
                 label = "",
                 elements = buttonLabels,
-                onSelectionChanged = { selectedLabel = it },
+                onSelectionChanged = { userResponses["persona"] = it },
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -227,90 +157,37 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
                 fontWeight = FontWeight.Bold
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "What time of day approx, " +
-                            "do you normally eat your biggest meal?",
-                    modifier = Modifier.weight(1f)
-                )
+            val timeQuestions = listOf(
+                "mealTime" to "What time of day approx, do you normally eat your biggest meal?",
+                "sleepTime" to "What time of day approx, do you go to sleep at night?",
+                "wakeTime" to "What time of day approx, do you wake up in the morning?"
+            )
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                OutlinedTextField(
-                    value = mealTime,
-                    onValueChange = { mealTime = it },
-                    placeholder = { Text("00:00") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = "Clock Icon"
-                        )
-                    },
-                    modifier = Modifier.width(120.dp)
-
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "What time of day approx, " +
-                            "do you go to sleep at night?",
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                OutlinedTextField(
-                    value = sleepTime,
-                    onValueChange = { sleepTime = it },
-                    placeholder = { Text("00:00") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = "Clock Icon"
-                        )
-                    },
-                    modifier = Modifier.width(120.dp)
-
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "What time of day approx, " +
-                            "do you wake up in the morning?",
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                OutlinedTextField(
-                    value = wakeTime,
-                    onValueChange = { wakeTime = it },
-                    placeholder = { Text("00:00") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = "Clock Icon"
-                        )
-                    },
-                    modifier = Modifier.width(120.dp)
-                )
+            timeQuestions.forEach { (key, question) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(question, modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedTextField(
+                        value = userResponses[key] as? String ?: "",
+                        onValueChange = { userResponses = userResponses.toMutableMap().apply { put(key, it) } },
+                        placeholder = { Text("00:00") },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.CheckCircle, contentDescription = "Clock Icon")
+                        },
+                        modifier = Modifier.width(120.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
+                    onSubmit(userResponses)
+//                    Log.d("UserResponses", userResponses.toString())
 //                    navController.navigate("login")
                 },
                 modifier = Modifier
