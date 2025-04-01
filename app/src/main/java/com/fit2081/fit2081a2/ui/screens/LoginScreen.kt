@@ -34,7 +34,12 @@ import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.utils.readCSVFile
 
 @Composable
-fun LoginScreen(navController: NavController, context: Context, modifier: Modifier = Modifier) {
+fun LoginScreen(
+    navController: NavController,
+    context: Context,
+    onLoginSuccess: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var selectedUserID by remember { mutableStateOf("") }
     var PhoneNumber by remember { mutableStateOf("") }
     var csvData by remember { mutableStateOf<Map<String, Map<String, String>>>(emptyMap()) }
@@ -107,6 +112,7 @@ fun LoginScreen(navController: NavController, context: Context, modifier: Modifi
                     val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
                     if (userPhone != null && userPhone == PhoneNumber) {
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
+                        onLoginSuccess(selectedUserID)
                         navController.navigate("questions")
                     } else {
                         Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
