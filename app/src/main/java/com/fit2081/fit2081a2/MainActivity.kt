@@ -18,11 +18,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -347,6 +352,7 @@ fun LoginScreen(navController: NavController, context: Context, modifier: Modifi
 
 @Composable
 fun QuestionScreen(navController: NavController, context: Context, modifier: Modifier) {
+    val scrollState = rememberScrollState()
     var isFruits by remember { mutableStateOf(false) }
     var isVegetables by remember { mutableStateOf(false) }
     var isGrains by remember { mutableStateOf(false) }
@@ -357,6 +363,9 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
     var isEggs by remember { mutableStateOf(false) }
     var isNutsSeeds by remember { mutableStateOf(false) }
     var selectedLabel by remember { mutableStateOf("") }
+    var mealTime by remember { mutableStateOf("") }
+    var sleepTime by remember { mutableStateOf("") }
+    var wakeTime by remember { mutableStateOf("") }
 
     @Composable
     fun CustomButton(text: String, ) {
@@ -382,18 +391,20 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
     ) {
         Column(
             modifier = Modifier
-//                .fillMaxSize()
+                .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(16.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
+            Spacer(modifier = Modifier.height(36.dp))
             Text(
                 "Tick all food categories you can eat",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+//            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -531,6 +542,124 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
                 onSelectionChanged = { selectedLabel = it },
             )
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "Timings",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "What time of day approx, " +
+                            "do you normally eat your biggest meal?",
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedTextField(
+                    value = mealTime,
+                    onValueChange = { mealTime = it },
+                    placeholder = { Text("00:00") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.CheckCircle,
+                            contentDescription = "Clock Icon"
+                        )
+                    },
+                    modifier = Modifier.width(120.dp)
+
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "What time of day approx, " +
+                        "do you go to sleep at night?",
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedTextField(
+                    value = sleepTime,
+                    onValueChange = { sleepTime = it },
+                    placeholder = { Text("00:00") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.CheckCircle,
+                            contentDescription = "Clock Icon"
+                        )
+                    },
+                    modifier = Modifier.width(120.dp)
+
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "What time of day approx, " +
+                            "do you wake up in the morning?",
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedTextField(
+                    value = wakeTime,
+                    onValueChange = { wakeTime = it },
+                    placeholder = { Text("00:00") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.CheckCircle,
+                            contentDescription = "Clock Icon"
+                        )
+                    },
+                    modifier = Modifier.width(120.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+//                    navController.navigate("login")
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(50.dp)
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5F29BD)
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Menu,
+                    contentDescription = "Save Icon",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    "Save",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                )
+            }
         }
     }
 }
