@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.ui.components.DropDownBar
+import com.fit2081.fit2081a2.ui.components.TopBar
 
 @Composable
 fun QuestionScreen(navController: NavController, context: Context, modifier: Modifier) {
@@ -58,24 +59,6 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
     var sleepTime by remember { mutableStateOf("") }
     var wakeTime by remember { mutableStateOf("") }
 
-    @Composable
-    fun CustomButton(text: String, ) {
-        Button(
-            onClick = {},
-            modifier = Modifier
-                .wrapContentSize()
-                .height(55.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F29BD)),
-            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-        ) {
-            Text(
-                text = text,
-                color = Color.White,
-            )
-        }
-    }
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
@@ -88,14 +71,17 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
-            Spacer(modifier = Modifier.height(36.dp))
+            TopBar(
+                title = "Food intake Questionnaire",
+                navController = navController,
+                onBackClick = true,
+            )
+
             Text(
                 "Tick all food categories you can eat",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-
-//            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -352,5 +338,23 @@ fun QuestionScreen(navController: NavController, context: Context, modifier: Mod
                 )
             }
         }
+    }
+}
+
+@Composable
+fun CustomButton(text: String, ) {
+    Button(
+        onClick = {},
+        modifier = Modifier
+            .wrapContentSize()
+            .height(55.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F29BD)),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+        )
     }
 }
