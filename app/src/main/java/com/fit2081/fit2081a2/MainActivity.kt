@@ -25,9 +25,13 @@ import com.fit2081.fit2081a2.ui.screens.WelcomeScreen
 import com.fit2081.fit2081a2.ui.screens.LoginScreen
 import com.fit2081.fit2081a2.ui.screens.QuestionScreen
 import com.fit2081.fit2081a2.ui.components.TopBar
+import com.fit2081.fit2081a2.utils.readCSVFile
 
 
 class MainActivity : ComponentActivity() {
+    private val userResponsesMap = mutableMapOf<String, MutableMap<String, Any>>()
+    private var userID by mutableStateOf("")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,19 +44,35 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     topBar = {}
                 ) { innerPadding ->
-                        NavHost(navController = navController, startDestination = "welcome") {
-                            composable("welcome") {
-                                WelcomeScreen(navController = navController, modifier = Modifier.padding(innerPadding))
-                            }
-                            composable("login") {
-                                LoginScreen(navController = navController, context = context, modifier = Modifier.padding(innerPadding))
-                            }
-                            composable("questions") {
-                                QuestionScreen(navController = navController, context = context, modifier = Modifier.padding(innerPadding))
-                            }
+                    NavHost(navController = navController, startDestination = "welcome") {
+                        composable("welcome") {
+                            WelcomeScreen(
+                                navController = navController,
+                                modifier = Modifier.padding(innerPadding)
+                            )
                         }
+                        composable("login") {
+                            LoginScreen(
+                                navController = navController,
+                                context = context,
+                                onLoginSuccess = { id -> setCurrentUserID(id) },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                        composable("questions") {
+                            QuestionScreen(
+                                navController = navController,
+                                onSubmit = {results ->  userResponsesMap[userID] = results},
+                                modifier = Modifier.padding(innerPadding))
+                        }
+                    }
                 }
             }
         }
     }
+
+    private fun setCurrentUserID(id: String) {
+        userID = id
+    }
 }
+
