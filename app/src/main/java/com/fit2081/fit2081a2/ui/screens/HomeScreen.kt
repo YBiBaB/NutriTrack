@@ -15,19 +15,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,7 +59,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(16.dp),
+                .padding(16.dp, top = 30.dp, bottom = 30.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -220,6 +219,32 @@ fun HomeScreen(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = Color.LightGray
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                "What is the food quality score?",
+                fontWeight = FontWeight.Bold,
+                fontSize = 21.sp
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text("Your Food Quality Score provides a snapshot of " +
+                    "how well your eating pattens align with established food guidelines," +
+                    "helping you identify bot strengths and opportunities for improvement in your diet."
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("This personalized measurement considers various food groups " +
+                    "including vegetables, fruits, whole grains, and proteins " +
+                    "to give you practical insights for making healthier food choices."
+            )
         }
     }
 }
