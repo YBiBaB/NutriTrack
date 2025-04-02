@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.ui.components.DropDownBar
-import com.fit2081.fit2081a2.ui.components.TopBar
 import com.fit2081.fit2081a2.ui.components.PersonaModal
 
 @SuppressLint("MutableCollectionMutableState")
@@ -72,12 +71,6 @@ fun QuestionScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
-//            TopBar(
-//                title = "Food intake Questionnaire",
-//                navController = navController,
-//                onBackClick = true,
-//            )
-
             Text(
                 "Tick all food categories you can eat",
                 fontWeight = FontWeight.Bold,
