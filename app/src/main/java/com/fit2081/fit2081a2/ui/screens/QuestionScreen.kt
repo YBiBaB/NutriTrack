@@ -1,7 +1,7 @@
 package com.fit2081.fit2081a2.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,14 +43,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.ui.components.TopBar
+import com.fit2081.fit2081a2.ui.components.PersonaModal
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun QuestionScreen(
     navController: NavController,
     onSubmit: (result: MutableMap<String, Any>) -> Unit,
+    context: Context,
     modifier: Modifier
 ) {
     val scrollState = rememberScrollState()
+    var showDialog by remember { mutableStateOf(false) }
+    var modalTitle by remember { mutableStateOf("") }
+    var modalImage by remember { mutableStateOf("") }
+    var modalMessage by remember { mutableStateOf("") }
     var userResponses by rememberSaveable { mutableStateOf(mutableMapOf<String, Any>()) }
 
     Surface(
@@ -65,11 +72,11 @@ fun QuestionScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
-            TopBar(
-                title = "Food intake Questionnaire",
-                navController = navController,
-                onBackClick = true,
-            )
+//            TopBar(
+//                title = "Food intake Questionnaire",
+//                navController = navController,
+//                onBackClick = true,
+//            )
 
             Text(
                 "Tick all food categories you can eat",
@@ -112,20 +119,72 @@ fun QuestionScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val personaTypes = listOf(
-                "Health Devotee", "Mindful Eater", "Wellness Striver",
-                "Balance Seeker", "Health Procrastinator", "Food Carefree"
+            val personaTypes = mapOf(
+                "Health Devotee" to mapOf(
+                    "imageName" to "persona_1",
+                    "text" to "Loves eating healthy food!"
+                ),
+                "Mindful Eater" to mapOf(
+                    "imageName" to "persona_2",
+                    "text" to "Pays attention to what they eat!"
+                ),
+                "Wellness Striver" to mapOf(
+                    "imageName" to "persona_3",
+                    "text" to "Strives for a balanced diet!"
+                ),
+                "Balance Seeker" to mapOf(
+                    "imageName" to "persona_4",
+                    "text" to "Wants a balance in diet!"
+                ),
+                "Health Procrastinator" to mapOf(
+                    "imageName" to "persona_5",
+                    "text" to "Plans to eat healthily but delays!"
+                ),
+                "Food Carefree" to mapOf(
+                    "imageName" to "persona_6",
+                    "text" to "Eats whatever they like!"
+                )
             )
 
-            personaTypes.chunked(3).forEach { rowItems ->
+            personaTypes.keys.chunked(3).forEach { rowItems ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    rowItems.forEach { label ->
-                        CustomButton(label)
+                    rowItems.forEach { title ->
+                        val info = personaTypes[title] ?: return@forEach
+                        Button(
+                            onClick = {
+                                showDialog = true
+                                modalTitle = title
+                                modalMessage = info["text"] ?: "No description found"
+                                modalImage = info["imageName"] ?: ""
+                            },
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .height(55.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F29BD)),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        ) {
+                            Text(
+                                text = title,
+                                color = Color.White,
+                            )
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            if (showDialog) {
+                PersonaModal(
+                    onDismiss = { showDialog = false },
+                    title = modalTitle,
+                    message = modalMessage,
+                    imageName = modalImage,
+                    context = context,
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,18 +193,9 @@ fun QuestionScreen(
                 "Which persona best fits you?",
             )
 
-            val buttonLabels = listOf(
-                "Health Devotee",
-                "Mindful Eater",
-                "Wellness Striver",
-                "Balance Seeker",
-                "Health Procrastinator",
-                "Food carefree",
-            )
-
             DropDownBar(
                 label = "",
-                elements = buttonLabels,
+                elements = personaTypes.keys.toList(),
                 onSelectionChanged = { userResponses["persona"] = it },
             )
 
@@ -180,6 +230,7 @@ fun QuestionScreen(
                         modifier = Modifier.width(120.dp)
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -188,7 +239,7 @@ fun QuestionScreen(
                 onClick = {
                     onSubmit(userResponses)
 //                    Log.d("UserResponses", userResponses.toString())
-//                    navController.navigate("login")
+                    navController.navigate("home")
                 },
                 modifier = Modifier
                     .width(200.dp)
@@ -215,23 +266,5 @@ fun QuestionScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun CustomButton(text: String, ) {
-    Button(
-        onClick = {},
-        modifier = Modifier
-            .wrapContentSize()
-            .height(55.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F29BD)),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-        )
     }
 }
