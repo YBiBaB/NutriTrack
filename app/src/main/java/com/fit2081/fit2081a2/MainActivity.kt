@@ -6,9 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,8 +22,9 @@ import com.fit2081.fit2081a2.ui.theme.FIT2081A2Theme
 import com.fit2081.fit2081a2.ui.screens.WelcomeScreen
 import com.fit2081.fit2081a2.ui.screens.LoginScreen
 import com.fit2081.fit2081a2.ui.screens.QuestionScreen
+import com.fit2081.fit2081a2.ui.screens.HomeScreen
+import com.fit2081.fit2081a2.ui.components.BottomBar
 import com.fit2081.fit2081a2.ui.components.TopBar
-import com.fit2081.fit2081a2.utils.readCSVFile
 
 
 class MainActivity : ComponentActivity() {
@@ -39,12 +38,50 @@ class MainActivity : ComponentActivity() {
             FIT2081A2Theme {
                 val navController = rememberNavController()
                 val context = LocalContext.current
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    topBar = {}
+                    topBar = {
+                        val showTopBar = when (currentRoute) {
+                            "welcome" -> false
+                            "login" -> false
+                            "questions" -> true
+                            else -> false
+                        }
+
+                        val title = when (currentRoute) {
+                            "questions" -> "Food intake Questionnaire"
+                            else -> ""
+                        }
+
+                        val showBackButton = when (currentRoute) {
+                            "welcome" -> false
+                            "login" -> false
+                            "questions" -> true
+                            else -> false
+                        }
+
+                        if (showTopBar) {
+                            TopBar(
+                                title = title,
+                                navController = navController,
+                                onBackClick = showBackButton
+                            )
+                        }
+                    },
+                    bottomBar = {
+                        if (shouldShowBottomBar(currentRoute)) {
+                            BottomBar(navController)
+                        }
+                    }
                 ) { innerPadding ->
-                    NavHost(navController = navController, startDestination = "welcome") {
+                    NavHost(
+                        navController = navController,
+                        startDestination = "welcome",
+                        Modifier.padding(innerPadding),
+                    ) {
                         composable("welcome") {
                             WelcomeScreen(
                                 navController = navController,
@@ -63,7 +100,11 @@ class MainActivity : ComponentActivity() {
                             QuestionScreen(
                                 navController = navController,
                                 onSubmit = {results ->  userResponsesMap[userID] = results},
+                                context = context,
                                 modifier = Modifier.padding(innerPadding))
+                        }
+                        composable("home") {
+                            HomeScreen()
                         }
                     }
                 }
@@ -73,6 +114,10 @@ class MainActivity : ComponentActivity() {
 
     private fun setCurrentUserID(id: String) {
         userID = id
+    }
+
+    private fun shouldShowBottomBar(currentRoute: String?): Boolean {
+        return currentRoute in listOf("home", )
     }
 }
 
