@@ -24,48 +24,48 @@ fun TopBar(
     onBackClick: Boolean,
     backgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = title,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = Color.Black
-                ),
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        },
-        navigationIcon = {
-            if (onBackClick) {
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier
-                        .padding(start = 0.dp)
-                        .size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.Black
-                    )
+    Column {
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.Black
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            navigationIcon = {
+                if (onBackClick) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .padding(start = 0.dp)
+                            .size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = backgroundColor
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .statusBarsPadding(),
-    )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = backgroundColor
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding(),
+        )
 
-    Divider(
-        color = Color.LightGray,
-        thickness = 1.dp,
-        modifier = Modifier.fillMaxWidth()
-    )
-
-//    Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 1.dp,
+            color = Color.LightGray
+        )
+    }
 }
