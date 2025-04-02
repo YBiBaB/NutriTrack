@@ -67,5 +67,5 @@ fun TopBar(
         modifier = Modifier.fillMaxWidth()
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+//    Spacer(modifier = Modifier.height(24.dp))
 }
