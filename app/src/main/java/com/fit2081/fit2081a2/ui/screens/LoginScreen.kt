@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.utils.readCSVFile
 
@@ -37,7 +38,7 @@ import com.fit2081.fit2081a2.utils.readCSVFile
 fun LoginScreen(
     navController: NavController,
     context: Context,
-    onLoginSuccess: (String) -> Unit,
+    currentUserID: UserViewModel,
     modifier: Modifier = Modifier
 ) {
     var selectedUserID by remember { mutableStateOf("") }
@@ -112,7 +113,7 @@ fun LoginScreen(
                     val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
                     if (userPhone != null && userPhone == PhoneNumber) {
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
-                        onLoginSuccess(selectedUserID)
+                        currentUserID.updateUserID(selectedUserID)
                         navController.navigate("questions")
                     } else {
                         Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()

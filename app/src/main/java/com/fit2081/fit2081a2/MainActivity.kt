@@ -1,5 +1,6 @@
 package com.fit2081.fit2081a2
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,8 +30,7 @@ import com.fit2081.fit2081a2.utils.readCSVFile
 
 
 class MainActivity : ComponentActivity() {
-    private val userResponsesMap = mutableMapOf<String, MutableMap<String, Any>>()
-    private var userID by mutableStateOf("")
+    private val usersResponsesMap = mutableMapOf<String, MutableMap<String, Any>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,7 @@ class MainActivity : ComponentActivity() {
                 val csvData = readCSVFile(context, "data.csv")
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val userViewModel: UserViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -92,21 +95,22 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(
                                 navController = navController,
                                 context = context,
-                                onLoginSuccess = { id -> setCurrentUserID(id) },
+                                currentUserID = userViewModel,
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
                         composable("questions") {
                             QuestionScreen(
                                 navController = navController,
-                                onSubmit = {results ->  userResponsesMap[userID] = results},
+                                onSubmit = {results ->  usersResponsesMap[userViewModel.userID] = results},
                                 context = context,
-                                modifier = Modifier.padding(innerPadding))
+                                modifier = Modifier.padding(innerPadding)
+                            )
                         }
                         composable("home") {
                             HomeScreen(
                                 navController = navController,
-                                currentUserID = userID,
+                                currentUserID = userViewModel.userID,
                                 csvData = csvData
                             )
                         }
@@ -116,14 +120,26 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun setCurrentUserID(id: String) {
-        userID = id
-    }
-
     private fun shouldShowBottomBar(currentRoute: String?): Boolean {
         return currentRoute in listOf(
             "home",
         )
+    }
+}
+
+class UserViewModel : ViewModel() {
+    var userID by mutableStateOf("")
+        private set
+
+    fun updateUserID(newID: String) {
+        userID = newID
+    }
+
+    var usersResponsesMap by mutableMapOf<String, MutableMap<String, Any>>()
+        private set
+
+    fun updateUsersResponsesMap(userID: String, userResponse: MutableMap<String, Any>) {
+        usersResponsesMap[userID] = userResponse
     }
 }
 
