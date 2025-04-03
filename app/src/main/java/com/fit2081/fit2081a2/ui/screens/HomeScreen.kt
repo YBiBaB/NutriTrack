@@ -45,6 +45,7 @@ import com.fit2081.fit2081a2.R
 @Composable
 fun HomeScreen(
     navController: NavController,
+    modifier: Modifier,
     currentUserID: String,
     csvData: Map<String, Map<String, String>>,
 ) {
@@ -105,7 +106,6 @@ fun HomeScreen(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
-//                        modifier = Modifier.padding(horizontal = 12.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,

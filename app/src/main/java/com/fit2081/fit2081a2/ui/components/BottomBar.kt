@@ -8,8 +8,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -18,21 +16,33 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomBar(navController: NavController) {
+fun BottomBar(
+    navController: NavController,
+    items: List<BottomNavItem>,
+    color: Color,
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val items = listOf(
-        BottomNavItem("Home", Icons.Default.Home, "home"),
-    )
 
     BottomNavigation(
         backgroundColor = Color.White,
-        contentColor = Color.Black
     ) {
         items.forEach { item ->
+            val isSelected = currentRoute == item.route
             BottomNavigationItem(
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) },
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) item.filledIcon else item.outlinedIcon,
+                        contentDescription = item.label,
+                        tint = if (isSelected) color else Color.Gray
+                    )
+               },
+                label = {
+                    Text(
+                        item.label,
+                        color = if (isSelected) color else Color.Gray
+                    )
+                },
                 selected = currentRoute == item.route,
                 onClick = {
                     if (currentRoute != item.route) {
@@ -49,6 +59,7 @@ fun BottomBar(navController: NavController) {
 
 data class BottomNavItem(
     val label: String,
-    val icon: ImageVector,
+    val outlinedIcon: ImageVector,
+    val filledIcon: ImageVector,
     val route: String
 )
