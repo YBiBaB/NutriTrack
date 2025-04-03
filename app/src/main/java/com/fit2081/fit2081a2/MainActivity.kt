@@ -67,11 +67,17 @@ class MainActivity : ComponentActivity() {
                             else -> false
                         }
 
+                        val backRoute = when (currentRoute) {
+                            "questions" -> "login"
+                            else -> null
+                        }
+
                         if (showTopBar) {
                             TopBar(
                                 title = title,
                                 navController = navController,
-                                onBackClick = showBackButton
+                                backRoute = backRoute,
+                                showBackButton = showBackButton,
                             )
                         }
                     },

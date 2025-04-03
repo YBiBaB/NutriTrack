@@ -21,7 +21,8 @@ import androidx.navigation.NavController
 fun TopBar(
     title: String,
     navController: NavController,
-    onBackClick: Boolean,
+    showBackButton: Boolean,
+    backRoute: String? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
     Column {
@@ -39,9 +40,15 @@ fun TopBar(
                 )
             },
             navigationIcon = {
-                if (onBackClick) {
+                if (showBackButton) {
                     IconButton(
-                        onClick = { navController.popBackStack() },
+                        onClick = {
+                            if (!backRoute.isNullOrEmpty()) {
+                                navController.navigate(backRoute)
+                            } else {
+                                navController.popBackStack()
+                            }
+                        },
                         modifier = Modifier
                             .padding(start = 0.dp)
                             .size(24.dp)
