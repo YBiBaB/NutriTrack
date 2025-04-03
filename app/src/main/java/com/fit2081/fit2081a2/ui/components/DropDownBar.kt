@@ -20,9 +20,14 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDownBar(label: String, elements: List<String>, onSelectionChanged: (String) -> Unit) {
+fun DropDownBar(
+    label: String,
+    elements: List<String>,
+    selectedValue:String? = null,
+    onSelectionChanged: (String) -> Unit,
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf("") }
+    var selected by remember { mutableStateOf(selectedValue ?: "") }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

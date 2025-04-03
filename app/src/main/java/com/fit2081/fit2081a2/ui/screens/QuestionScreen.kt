@@ -29,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.ui.components.PersonaModal
 
@@ -48,7 +50,8 @@ import com.fit2081.fit2081a2.ui.components.PersonaModal
 @Composable
 fun QuestionScreen(
     navController: NavController,
-    onSubmit: (result: MutableMap<String, Any>) -> Unit,
+//    onSubmit: (result: MutableMap<String, Any>) -> Unit,
+    userViewModel: UserViewModel,
     context: Context,
     modifier: Modifier
 ) {
@@ -57,7 +60,15 @@ fun QuestionScreen(
     var modalTitle by remember { mutableStateOf("") }
     var modalImage by remember { mutableStateOf("") }
     var modalMessage by remember { mutableStateOf("") }
+    val userID = userViewModel.userID
+
     var userResponses by rememberSaveable { mutableStateOf(mutableMapOf<String, Any>()) }
+
+    LaunchedEffect(userID) {
+        userViewModel.usersResponsesMap[userID]?.let {
+            userResponses = it.toMutableMap()
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -206,7 +217,10 @@ fun QuestionScreen(
             DropDownBar(
                 label = "",
                 elements = personaTypes.keys.toList(),
-                onSelectionChanged = { userResponses["persona"] = it },
+                selectedValue =  userResponses["persona"] as? String,
+                onSelectionChanged = {
+                    userResponses = userResponses.toMutableMap().apply { put("persona", it) }
+                },
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -247,8 +261,10 @@ fun QuestionScreen(
 
             Button(
                 onClick = {
-                    onSubmit(userResponses)
-//                    Log.d("UserResponses", userResponses.toString())
+                    userViewModel.updateUsersResponsesMap(
+                        userID = userID,
+                        userResponse = userResponses
+                    )
                     navController.navigate("home")
                 },
                 modifier = Modifier
