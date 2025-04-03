@@ -38,7 +38,8 @@ import com.fit2081.fit2081a2.utils.readCSVFile
 fun LoginScreen(
     navController: NavController,
     context: Context,
-    currentUserID: UserViewModel,
+//    currentUserID: UserViewModel,
+    userViewModel: UserViewModel,
     modifier: Modifier = Modifier
 ) {
     var selectedUserID by remember { mutableStateOf("") }
@@ -113,7 +114,7 @@ fun LoginScreen(
                     val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
                     if (userPhone != null && userPhone == PhoneNumber) {
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
-                        currentUserID.updateUserID(selectedUserID)
+                        userViewModel.updateUserID(selectedUserID)
                         navController.navigate("questions")
                     } else {
                         Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()

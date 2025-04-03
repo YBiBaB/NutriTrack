@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -85,6 +86,9 @@ fun HomeScreen(
                         "but you can change details here.",
                     modifier = Modifier.weight(1f)
                 )
+
+                Spacer(modifier = Modifier.width(5.dp))
+
                 Button(
                     onClick = {
                         navController.navigate("questions")
