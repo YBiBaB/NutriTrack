@@ -50,7 +50,6 @@ import com.fit2081.fit2081a2.ui.components.PersonaModal
 @Composable
 fun QuestionScreen(
     navController: NavController,
-//    onSubmit: (result: MutableMap<String, Any>) -> Unit,
     userViewModel: UserViewModel,
     context: Context,
     modifier: Modifier

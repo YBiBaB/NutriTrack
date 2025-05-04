@@ -98,13 +98,23 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = PhoneNumber,
-                onValueChange = { PhoneNumber = it },
-                label = { Text(text = "Enter your number") },
+                onValueChange = {
+                    // 仅允许输入数字，并限制长度不超过 11
+                    if (it.length <= 11 && it.all { char -> char.isDigit() }) {
+                        PhoneNumber = it
+                    }
+                },
+                label = { Text("Enter your number") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 ),
                 isError = PhoneNumber.length != 11 && PhoneNumber.isNotEmpty(),
+                supportingText = {
+                    if (PhoneNumber.isNotEmpty() && PhoneNumber.length != 11) {
+                        Text("Phone number must be exactly 11 digits")
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
