@@ -25,17 +25,17 @@ fun DropDownBar(
     elements: List<String>,
     selectedValue:String? = null,
     onSelectionChanged: (String) -> Unit,
+    isError: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf(selectedValue ?: "") }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange =  {expanded = it}
     ) {
         OutlinedTextField(
-            value = selected,
-            onValueChange = { selected = it },
+            value = selectedValue ?: "",
+            onValueChange = {},
             placeholder = { Text(text = label) },
             readOnly = true,
             trailingIcon = {
@@ -49,6 +49,7 @@ fun DropDownBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
+            isError = isError
         )
 
         ExposedDropdownMenu(
@@ -59,7 +60,6 @@ fun DropDownBar(
                 DropdownMenuItem(
                     text = { Text (element) },
                     onClick = {
-                        selected = element
                         onSelectionChanged(element)
                         expanded = false
                     }
