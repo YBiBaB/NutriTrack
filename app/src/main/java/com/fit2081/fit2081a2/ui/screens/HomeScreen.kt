@@ -150,7 +150,9 @@ fun HomeScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable{}
+                        .clickable{
+                            navController.navigate("insights")
+                        }
                 ) {
                     Text(
                         "See all scores",
