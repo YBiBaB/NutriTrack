@@ -63,6 +63,55 @@ fun QuestionScreen(
 
     var userResponses by rememberSaveable { mutableStateOf(mutableMapOf<String, Any>()) }
 
+    var missingFields by remember { mutableStateOf(setOf<String>()) }
+    var duplicateTimeFields by remember { mutableStateOf(setOf<String>()) }
+
+    val foodOptions = listOf("Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds")
+
+    val personaTypes = mapOf(
+        "Health Devotee" to mapOf(
+            "imageName" to "persona_1",
+            "text" to "I’m passionate about healthy eating & health plays a big part in my life. " +
+                    "I use social media to follow active lifestyle personalities or get new recipes/exercise ideas. " +
+                    "I may even buy superfoods or follow a particular type of diet. I like to think I am super healthy."
+        ),
+        "Mindful Eater" to mapOf(
+            "imageName" to "persona_2",
+            "text" to "I’m health-conscious and being healthy and eating healthy is important to me. " +
+                    "Although health means different things to different people, " +
+                    "I make conscious lifestyle decisions about eating based on what I believe healthy means. " +
+                    "I look for new recipes and healthy eating information on social media."
+        ),
+        "Wellness Striver" to mapOf(
+            "imageName" to "persona_3",
+            "text" to "I aspire to be healthy (but struggle sometimes). " +
+                    "Healthy eating is hard work! " +
+                    "I’ve tried to improve my diet, " +
+                    "but always find things that make it difficult to stick with the changes. " +
+                    "Sometimes I notice recipe ideas or healthy eating hacks, and if it seems easy enough, I’ll give it a go."
+        ),
+        "Balance Seeker" to mapOf(
+            "imageName" to "persona_4",
+            "text" to "I try and live a balanced lifestyle, " +
+                    "and I think that all foods are okay in moderation. " +
+                    "I shouldn’t have to feel guilty about eating a piece of cake now and again. " +
+                    "I get all sorts of inspiration from social media like finding out about new restaurants, " +
+                    "fun recipes and sometimes healthy eating tips."
+        ),
+        "Health Procrastinator" to mapOf(
+            "imageName" to "persona_5",
+            "text" to "I’m contemplating healthy eating but it’s not a priority for me right now. " +
+                    "I know the basics about what it means to be healthy, but it doesn’t seem relevant to me right now. " +
+                    "I have taken a few steps to be healthier but I am not motivated to make it a high priority " +
+                    "because I have too many other things going on in my life."
+        ),
+        "Food Carefree" to mapOf(
+            "imageName" to "persona_6",
+            "text" to "I’m not bothered about healthy eating. I don’t really see the point and I don’t think about it. " +
+                    "I don’t really notice healthy eating tips or recipes and I don’t care what I eat."
+        )
+    )
+
     LaunchedEffect(userID) {
         userViewModel.usersResponsesMap[userID]?.let {
             userResponses = it.toMutableMap()
@@ -81,13 +130,20 @@ fun QuestionScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
+            if (missingFields.isNotEmpty() || duplicateTimeFields.isNotEmpty()) {
+                Text(
+                    text = "Please complete all required fields and avoid duplicate times.",
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
             Text(
                 "Tick all food categories you can eat",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-
-            val foodOptions = listOf("Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds")
 
             foodOptions.chunked(3).forEach { rowItems ->
                 Row(
@@ -121,50 +177,6 @@ fun QuestionScreen(
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            val personaTypes = mapOf(
-                "Health Devotee" to mapOf(
-                    "imageName" to "persona_1",
-                    "text" to "I’m passionate about healthy eating & health plays a big part in my life. " +
-                            "I use social media to follow active lifestyle personalities or get new recipes/exercise ideas. " +
-                            "I may even buy superfoods or follow a particular type of diet. I like to think I am super healthy."
-                ),
-                "Mindful Eater" to mapOf(
-                    "imageName" to "persona_2",
-                    "text" to "I’m health-conscious and being healthy and eating healthy is important to me. " +
-                            "Although health means different things to different people, " +
-                            "I make conscious lifestyle decisions about eating based on what I believe healthy means. " +
-                            "I look for new recipes and healthy eating information on social media."
-                ),
-                "Wellness Striver" to mapOf(
-                    "imageName" to "persona_3",
-                    "text" to "I aspire to be healthy (but struggle sometimes). " +
-                            "Healthy eating is hard work! " +
-                            "I’ve tried to improve my diet, " +
-                            "but always find things that make it difficult to stick with the changes. " +
-                            "Sometimes I notice recipe ideas or healthy eating hacks, and if it seems easy enough, I’ll give it a go."
-                ),
-                "Balance Seeker" to mapOf(
-                    "imageName" to "persona_4",
-                    "text" to "I try and live a balanced lifestyle, " +
-                            "and I think that all foods are okay in moderation. " +
-                            "I shouldn’t have to feel guilty about eating a piece of cake now and again. " +
-                            "I get all sorts of inspiration from social media like finding out about new restaurants, " +
-                            "fun recipes and sometimes healthy eating tips."
-                ),
-                "Health Procrastinator" to mapOf(
-                    "imageName" to "persona_5",
-                    "text" to "I’m contemplating healthy eating but it’s not a priority for me right now. " +
-                            "I know the basics about what it means to be healthy, but it doesn’t seem relevant to me right now. " +
-                            "I have taken a few steps to be healthier but I am not motivated to make it a high priority " +
-                            "because I have too many other things going on in my life."
-                ),
-                "Food Carefree" to mapOf(
-                    "imageName" to "persona_6",
-                    "text" to "I’m not bothered about healthy eating. I don’t really see the point and I don’t think about it. " +
-                            "I don’t really notice healthy eating tips or recipes and I don’t care what I eat."
-                )
-            )
 
             personaTypes.keys.chunked(3).forEach { rowItems ->
                 Row(
@@ -220,6 +232,7 @@ fun QuestionScreen(
                 onSelectionChanged = {
                     userResponses = userResponses.toMutableMap().apply { put("persona", it) }
                 },
+                isError = "persona" in missingFields
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -250,7 +263,8 @@ fun QuestionScreen(
                         leadingIcon = {
                             Icon(imageVector = Icons.Outlined.CheckCircle, contentDescription = "Clock Icon")
                         },
-                        modifier = Modifier.width(120.dp)
+                        isError = key in missingFields || key in duplicateTimeFields,
+                        modifier = Modifier.width(120.dp),
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -260,11 +274,32 @@ fun QuestionScreen(
 
             Button(
                 onClick = {
-                    userViewModel.updateUsersResponsesMap(
-                        userID = userID,
-                        userResponse = userResponses
-                    )
-                    navController.navigate("home")
+                    val requiredKeys = listOf("mealTime", "sleepTime", "wakeTime", "persona")
+                    val newMissing = mutableSetOf<String>()
+
+                    requiredKeys.forEach { key ->
+                        if ((userResponses[key] as? String).isNullOrBlank()) newMissing.add(key)
+                    }
+
+                    val selectedFoods = foodOptions.any { userResponses[it] == true }
+                    if (!selectedFoods) newMissing.add("food")
+
+                    val timeValues = timeQuestions.map { (k, _) -> k to (userResponses[k] as? String ?: "") }
+                    val duplicates = timeValues.groupBy { it.second }
+                        .filter { it.key.isNotBlank() && it.value.size > 1 }
+                        .flatMap { it.value.map { it.first } }
+                        .toSet()
+
+                    missingFields = newMissing
+                    duplicateTimeFields = duplicates
+
+                    if (missingFields.isEmpty() && duplicateTimeFields.isEmpty()) {
+                        userViewModel.updateUsersResponsesMap(
+                            userID = userID,
+                            userResponse = userResponses
+                        )
+                        navController.navigate("home")
+                    }
                 },
                 modifier = Modifier
                     .width(200.dp)
