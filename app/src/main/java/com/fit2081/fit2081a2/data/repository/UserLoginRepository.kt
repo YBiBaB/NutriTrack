@@ -30,4 +30,6 @@ class UserLoginRepository(private val userLoginDao: UserLoginDao) {
         val user = UserLogin(username = username, passwordHash = hashedPassword)
         return userLoginDao.insert(user)
     }
+
+    suspend fun deleteAll() = userLoginDao.deleteAll()
 }

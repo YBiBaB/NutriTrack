@@ -8,13 +8,17 @@ import com.fit2081.fit2081a2.data.db.entities.UserLogin
 interface UserLoginDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(userLogin: UserLogin)
+    suspend fun insert(userLogin: UserLogin): Long
 
     @Query("SELECT * FROM UserLogin WHERE userId = :userId")
     suspend fun getById(userId: Int): UserLogin?
 
     @Query("SELECT * FROM UserLogin WHERE username = :username AND passwordHash = :password")
     suspend fun login(username: String, password: String): UserLogin?
+
+    @Query("DELETE FROM UserLogin")
+    suspend fun deleteAll()
+
 
     // Password hash verification
     @Transaction

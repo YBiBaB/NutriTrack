@@ -11,4 +11,6 @@ class ScoreRecordRepository(private val scoreRecordDao: ScoreRecordDao) {
     suspend fun getByPatientId(patientId: Int): List<ScoreRecord> {
         return scoreRecordDao.getByPatientId(patientId)
     }
+
+    suspend fun deleteAll() = scoreRecordDao.deleteAll()
 }

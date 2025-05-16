@@ -12,4 +12,7 @@ class FoodIntakeRepository(private val foodIntakeDao: FoodIntakeDao) {
     suspend fun getByPatientId(patientId: Int): FoodIntake? {
         return foodIntakeDao.getByPatientId(patientId)
     }
+
+    suspend fun deleteAll() = foodIntakeDao.deleteAll()
+
 }
