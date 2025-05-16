@@ -10,5 +10,4 @@ data class UserLogin (
 
     val username: String,  // User_ID in CSV
     val passwordHash: String,  // Hash value of password
-    val role: String  // Role of user
 )
