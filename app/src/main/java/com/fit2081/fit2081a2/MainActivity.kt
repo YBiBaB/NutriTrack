@@ -24,22 +24,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.fit2081.fit2081a2.data.db.AppDatabase
+import com.fit2081.fit2081a2.data.repository.*
 import com.fit2081.fit2081a2.ui.theme.FIT2081A2Theme
 import com.fit2081.fit2081a2.ui.screens.*
 import com.fit2081.fit2081a2.ui.components.*
+import com.fit2081.fit2081a2.utils.DataImportManager
 import com.fit2081.fit2081a2.utils.readCSVFile
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
-//    private val usersResponsesMap = mutableMapOf<String, MutableMap<String, Any>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch {
+            DataImportManager.importIfNeeded(
+                context = this@MainActivity,
+                fileName = "data.csv",
+                userLoginRepo = UserLoginRepository(AppDatabase.getDatabase(this@MainActivity).userLoginDao()),
+                patientRepo = PatientRepository(AppDatabase.getDatabase(this@MainActivity).patientDao()),
+                dietRepo = DietRecordRepository(AppDatabase.getDatabase(this@MainActivity).dietRecordDao()),
+                scoreRepo = ScoreRecordRepository(AppDatabase.getDatabase(this@MainActivity).scoreRecordDao())
+            )
+        }
+
+//        lifecycleScope.launch {
+//            DataImportManager.resetImportStatus(
+//                context = this@MainActivity,
+//                userLoginRepo = UserLoginRepository(AppDatabase.getDatabase(this@MainActivity).userLoginDao()),
+//                patientRepo = PatientRepository(AppDatabase.getDatabase(this@MainActivity).patientDao()),
+//                dietRepo = DietRecordRepository(AppDatabase.getDatabase(this@MainActivity).dietRecordDao()),
+//                scoreRepo = ScoreRecordRepository(AppDatabase.getDatabase(this@MainActivity).scoreRecordDao())
+//            )
+//        }
+
         enableEdgeToEdge()
         setContent {
             FIT2081A2Theme {
