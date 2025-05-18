@@ -20,7 +20,8 @@ data class Patient(
     val patientId: Int = 0,     // A_I PK
 
     val userId: Int,            // FK of UserLogin
-    val name: String,           // Patient name
+    val firstName: String?,      // First name of the patient
+    val lastName: String?,       // Last name of the patient
     val phoneNumber: String,    // Patient phone number
     val sex: String             // Patient gender
 )
