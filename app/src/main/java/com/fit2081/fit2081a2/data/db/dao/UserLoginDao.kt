@@ -16,22 +16,14 @@ interface UserLoginDao {
     @Query("SELECT userId FROM UserLogin")
     suspend fun getAllUserIds(): List<Int>
 
-    @Query("SELECT * FROM UserLogin WHERE userId = :userId AND passwordHash = :password")
-    suspend fun login(userId: Int, password: String): UserLogin?
+    @Query("SELECT * FROM UserLogin WHERE userId = :userId AND passwordHash = :passwordHash")
+    suspend fun login(userId: Int, passwordHash: String): UserLogin?
 
     @Query("UPDATE UserLogin SET passwordHash = :hashedPassword WHERE userId = :userId")
     suspend fun updatePassword(userId: Int, hashedPassword: String)
 
     @Query("DELETE FROM UserLogin")
     suspend fun deleteAll()
-
-
-    // Password hash verification
-    @Transaction
-    suspend fun loginWithHashedPassword(userId: Int, password: String): UserLogin? {
-        val hashedPassword = hashPassword(password) // Hash password
-        return login(userId, hashedPassword)
-    }
 
     // Function to encrypt password by SHA-256
     fun hashPassword(password: String): String {

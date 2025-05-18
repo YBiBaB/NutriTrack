@@ -20,10 +20,10 @@ class UserLoginViewModel(application: Application) : AndroidViewModel(applicatio
 
     suspend fun getAllUserIds(): List<Int> = repository.getAllUserIds()
 
-    fun login(userId: Int, password: String, onResult: (UserLogin?) -> Unit) {
+    fun login(userId: Int, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            val user = repository.login(userId, password)
-            onResult(user)
+            val user = repository.login(userId, password)  // Return UserLogin?
+            onResult(user != null) // Success if not null
         }
     }
 

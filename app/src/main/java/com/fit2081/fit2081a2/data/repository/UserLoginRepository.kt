@@ -20,8 +20,9 @@ class UserLoginRepository(private val userLoginDao: UserLoginDao) {
     }
 
     suspend fun login(userId: Int, plainPassword: String): UserLogin? {
+        val hashedPassword = userLoginDao.hashPassword(plainPassword)
         return withContext(Dispatchers.IO) {
-            userLoginDao.loginWithHashedPassword(userId, plainPassword)
+            userLoginDao.login(userId, hashedPassword)
         }
     }
 

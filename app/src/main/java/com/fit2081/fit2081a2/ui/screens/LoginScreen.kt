@@ -29,11 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.ui.components.DropDownBar
+import com.fit2081.fit2081a2.utils.UserSessionManager
 import com.fit2081.fit2081a2.utils.readCSVFile
 import com.fit2081.fit2081a2.viewmodel.UserLoginViewModel
 
@@ -45,16 +47,8 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
     var selectedUserID: Any? by remember { mutableStateOf(null) }
-    var PhoneNumber by remember { mutableStateOf("") }
-    var csvData by remember { mutableStateOf<Map<String, Map<String, String>>>(emptyMap()) }
+    var password by remember { mutableStateOf("") }
     val userIDs = remember { mutableStateListOf<Int>() }
-
-//    LaunchedEffect(Unit) {
-//        csvData = readCSVFile(context, "data.csv")
-//        if (csvData.isNotEmpty()) {
-//            userIDs.addAll(csvData.keys)
-//        }
-//    }
 
     LaunchedEffect(Unit) {
         val ids = userLoginViewModel.getAllUserIds()  // List<Int>
@@ -98,49 +92,48 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "Phone Number",
+                "Password",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Start),
             )
 
             OutlinedTextField(
-                value = PhoneNumber,
+                value = password,
                 onValueChange = {
-                    // 仅允许输入数字，并限制长度不超过 11
-                    if (it.length <= 11 && it.all { char -> char.isDigit() }) {
-                        PhoneNumber = it
-                    }
+                    password = it
                 },
-                label = { Text("Enter your number") },
+                label = { Text("Enter your password") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Password
                 ),
-                isError = PhoneNumber.length != 11 && PhoneNumber.isNotEmpty(),
-                supportingText = {
-                    if (PhoneNumber.isNotEmpty() && PhoneNumber.length != 11) {
-                        Text("Phone number must be exactly 11 digits")
-                    }
-                }
+                visualTransformation = PasswordVisualTransformation(),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("This app is only for pre-registered users. " +
-                    "Please have your ID and phone number handy before continuing."
+                    "Please enter your ID and password or Register " +
+                    "to claim your account on your first visit."
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
-                    if (userPhone != null && userPhone == PhoneNumber) {
-                        Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
-//                        userViewModel.updateUserID(selectedUserID)
-                        navController.navigate("questions")
+                    val uid = selectedUserID as? Int
+                    if (uid != null) {
+                        userLoginViewModel.login(uid, password) { isSuccess ->
+                            if (isSuccess) {
+                                UserSessionManager.saveUserSession(context, uid)
+                                Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
+                                navController.navigate("questions")
+                            } else {
+                                Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
+                            }
+                        }
                     } else {
-                        Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Please select a valid ID", Toast.LENGTH_LONG).show()
                     }
                 },
                 modifier = Modifier
