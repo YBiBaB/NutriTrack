@@ -15,7 +15,7 @@ import com.fit2081.fit2081a2.data.db.entities.*
         FoodIntake::class,
         DietRecord::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

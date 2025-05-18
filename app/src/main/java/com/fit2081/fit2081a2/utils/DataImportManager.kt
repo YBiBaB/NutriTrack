@@ -19,13 +19,14 @@ object DataImportManager {
 
         for ((userId, fields) in csvData) {
             // 1. 插入 UserLogin
-            val userLogin = UserLogin(username = userId, passwordHash = "")
+            val userLogin = UserLogin(userId = userId.toInt(), passwordHash = "")
             val insertedUserId = userLoginRepository.insert(userLogin).toInt()
 
             // 2. 插入 Patient
             val patient = Patient(
                 userId = insertedUserId,
-                name = userId, // 没有名字用User_ID占位
+                firstName = null, // 没有名字用User_ID占位
+                lastName = null,
                 phoneNumber = fields["PhoneNumber"] ?: "",
                 sex = fields["Sex"] ?: ""
             )
