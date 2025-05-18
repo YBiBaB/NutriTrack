@@ -35,8 +35,8 @@ import com.fit2081.fit2081a2.data.repository.*
 import com.fit2081.fit2081a2.ui.theme.FIT2081A2Theme
 import com.fit2081.fit2081a2.ui.screens.*
 import com.fit2081.fit2081a2.ui.components.*
-import com.fit2081.fit2081a2.utils.DataImportManager
-import com.fit2081.fit2081a2.utils.readCSVFile
+import com.fit2081.fit2081a2.utils.*
+import com.fit2081.fit2081a2.viewmodel.*
 import kotlinx.coroutines.launch
 
 
@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 val userViewModel: UserViewModel = viewModel()
+                val userLoginViewModel: UserLoginViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -166,7 +167,15 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(
                                 navController = navController,
                                 context = context,
-                                userViewModel = userViewModel,
+                                userLoginViewModel = userLoginViewModel,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                        composable("register") {
+                            RegisterScreen(
+                                navController = navController,
+                                context = context,
+                                userLoginViewModel = userLoginViewModel,
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
