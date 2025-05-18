@@ -25,6 +25,8 @@ class UserLoginRepository(private val userLoginDao: UserLoginDao) {
         }
     }
 
+    suspend fun getAllUserIds(): List<Int> = userLoginDao.getAllUserIds()
+
     suspend fun register(userId: Int, password: String): Long {
         val hashedPassword = userLoginDao.hashPassword(password)
         val user = UserLogin(userId = userId, passwordHash = hashedPassword)

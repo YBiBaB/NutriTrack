@@ -17,6 +17,8 @@ class UserLoginViewModel(application: Application) : AndroidViewModel(applicatio
         repository = UserLoginRepository(database.userLoginDao())
     }
 
+    suspend fun getAllUserIds(): List<Int> = repository.getAllUserIds()
+
     fun login(userId: Int, password: String, onResult: (UserLogin?) -> Unit) {
         viewModelScope.launch {
             val user = repository.login(userId, password)

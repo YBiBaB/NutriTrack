@@ -13,6 +13,9 @@ interface UserLoginDao {
     @Query("SELECT * FROM UserLogin WHERE userId = :userId")
     suspend fun getById(userId: Int): UserLogin?
 
+    @Query("SELECT userId FROM UserLogin")
+    suspend fun getAllUserIds(): List<Int>
+
     @Query("SELECT * FROM UserLogin WHERE userId = :userId AND passwordHash = :password")
     suspend fun login(userId: Int, password: String): UserLogin?
 
