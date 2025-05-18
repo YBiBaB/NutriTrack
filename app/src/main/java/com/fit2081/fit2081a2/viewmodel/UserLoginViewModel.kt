@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.fit2081.fit2081a2.data.db.AppDatabase
 import com.fit2081.fit2081a2.data.db.entities.UserLogin
 import com.fit2081.fit2081a2.data.repository.UserLoginRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UserLoginViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,6 +31,12 @@ class UserLoginViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             val insertedId = repository.register(userId, password)
             onResult(insertedId)
+        }
+    }
+
+    fun updatePassword(userId: Int, plainPassword: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updatePassword(userId, plainPassword)
         }
     }
 }

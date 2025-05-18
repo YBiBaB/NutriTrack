@@ -35,5 +35,10 @@ class UserLoginRepository(private val userLoginDao: UserLoginDao) {
         }
     }
 
+    suspend fun updatePassword(userId: Int, plainPassword: String) {
+        val hashed = userLoginDao.hashPassword(plainPassword)
+        userLoginDao.updatePassword(userId, hashed)
+    }
+
     suspend fun deleteAll() = userLoginDao.deleteAll()
 }

@@ -19,6 +19,9 @@ interface UserLoginDao {
     @Query("SELECT * FROM UserLogin WHERE userId = :userId AND passwordHash = :password")
     suspend fun login(userId: Int, password: String): UserLogin?
 
+    @Query("UPDATE UserLogin SET passwordHash = :hashedPassword WHERE userId = :userId")
+    suspend fun updatePassword(userId: Int, hashedPassword: String)
+
     @Query("DELETE FROM UserLogin")
     suspend fun deleteAll()
 
