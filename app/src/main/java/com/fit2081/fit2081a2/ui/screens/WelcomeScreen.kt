@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -27,9 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.R
+import com.fit2081.fit2081a2.utils.UserSessionManager
 
 @Composable
 fun WelcomeScreen(navController: NavController, modifier: Modifier) {
+    val context = LocalContext.current
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -73,7 +76,12 @@ fun WelcomeScreen(navController: NavController, modifier: Modifier) {
 
             Button(
                 onClick = {
-                    navController.navigate("login")
+                    val userId = UserSessionManager.getLoggedInUserId(context)
+                    if (userId != null) {
+                        navController.navigate("questions")
+                    } else {
+                        navController.navigate("login")
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

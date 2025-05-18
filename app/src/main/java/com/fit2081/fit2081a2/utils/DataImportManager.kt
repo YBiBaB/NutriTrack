@@ -18,21 +18,21 @@ object DataImportManager {
         val csvData = readCSVFile(context, fileName)
 
         for ((userId, fields) in csvData) {
-            // 1. 插入 UserLogin
+            // 1. Insert UserLogin
             val userLogin = UserLogin(userId = userId.toInt(), passwordHash = "")
             val insertedUserId = userLoginRepository.insert(userLogin).toInt()
 
-            // 2. 插入 Patient
+            // 2. Insert Patient
             val patient = Patient(
                 userId = insertedUserId,
-                firstName = null, // 没有名字用User_ID占位
+                firstName = null,
                 lastName = null,
                 phoneNumber = fields["PhoneNumber"] ?: "",
                 sex = fields["Sex"] ?: ""
             )
             val patientId = patientRepository.insert(patient).toInt()
 
-            // 3. 插入 DietRecord
+            // 3. Insert DietRecord
             val dietRecord = DietRecord(
                 patientId = patientId,
                 discretionaryServeSize = fields["Discretionaryservesize"]?.toDoubleOrNull() ?: 0.0,
@@ -70,7 +70,7 @@ object DataImportManager {
             )
             dietRecordRepository.insert(dietRecord)
 
-            // 4. 插入 ScoreRecord，根据 sex 字段区分男女性别字段
+            // 4. Insert ScoreRecord, Distinguish between male and female gender fields based on the sex field
             val sex = fields["Sex"] ?: "Male"
             fun pickScore(maleKey: String, femaleKey: String) =
                 if (sex.equals("Male", true)) fields[maleKey]?.toDoubleOrNull() ?: 0.0 else fields[femaleKey]?.toDoubleOrNull() ?: 0.0
