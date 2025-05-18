@@ -9,6 +9,11 @@ class PatientRepository(private val patientDao: PatientDao) {
         return patientDao.insert(patient)
     }
 
+    suspend fun getPhoneNumberByUserId(userId: Int): String? {
+        return patientDao.getPhoneNumberByUserId(userId)
+    }
+
+
     suspend fun getById(id: Int): Patient? {
         return patientDao.getById(id)
     }
