@@ -35,25 +35,31 @@ import androidx.navigation.NavController
 import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.utils.readCSVFile
+import com.fit2081.fit2081a2.viewmodel.UserLoginViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     context: Context,
-//    currentUserID: UserViewModel,
-    userViewModel: UserViewModel,
+    userLoginViewModel: UserLoginViewModel,
     modifier: Modifier = Modifier
 ) {
     var selectedUserID: Any? by remember { mutableStateOf(null) }
     var PhoneNumber by remember { mutableStateOf("") }
     var csvData by remember { mutableStateOf<Map<String, Map<String, String>>>(emptyMap()) }
-    var userIDs = remember { mutableStateListOf<String>() }
+    val userIDs = remember { mutableStateListOf<Int>() }
+
+//    LaunchedEffect(Unit) {
+//        csvData = readCSVFile(context, "data.csv")
+//        if (csvData.isNotEmpty()) {
+//            userIDs.addAll(csvData.keys)
+//        }
+//    }
 
     LaunchedEffect(Unit) {
-        csvData = readCSVFile(context, "data.csv")
-        if (csvData.isNotEmpty()) {
-            userIDs.addAll(csvData.keys)
-        }
+        val ids = userLoginViewModel.getAllUserIds()  // List<Int>
+        userIDs.clear()
+        userIDs.addAll(ids)
     }
 
     Surface(
@@ -154,6 +160,24 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Button(
+                onClick = {
+                    navController.navigate("register")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5F29BD)
+                )
+            ) {
+                Text(
+                    "Register",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                )
+            }
         }
     }
 }
