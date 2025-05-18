@@ -44,7 +44,7 @@ fun LoginScreen(
     userViewModel: UserViewModel,
     modifier: Modifier = Modifier
 ) {
-    var selectedUserID by remember { mutableStateOf("") }
+    var selectedUserID: Any? by remember { mutableStateOf(null) }
     var PhoneNumber by remember { mutableStateOf("") }
     var csvData by remember { mutableStateOf<Map<String, Map<String, String>>>(emptyMap()) }
     var userIDs = remember { mutableStateListOf<String>() }
@@ -85,6 +85,7 @@ fun LoginScreen(
             DropDownBar(
                 label = "Select your ID",
                 elements = userIDs,
+                selectedValue = selectedUserID,
                 onSelectionChanged = { selectedUserID = it }
             )
 
@@ -127,14 +128,14 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
-                    if (userPhone != null && userPhone == PhoneNumber) {
-                        Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
-                        userViewModel.updateUserID(selectedUserID)
-                        navController.navigate("questions")
-                    } else {
-                        Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
-                    }
+//                    val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
+//                    if (userPhone != null && userPhone == PhoneNumber) {
+//                        Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
+//                        userViewModel.updateUserID(selectedUserID)
+//                        navController.navigate("questions")
+//                    } else {
+//                        Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
+//                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

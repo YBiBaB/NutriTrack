@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDownBar(
+fun <T> DropDownBar(
     label: String,
-    elements: List<String>,
-    selectedValue:String? = null,
-    onSelectionChanged: (String) -> Unit,
+    elements: List<T>,
+    selectedValue: T? = null,
+    onSelectionChanged: (T) -> Unit,
     isError: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -34,7 +34,7 @@ fun DropDownBar(
         onExpandedChange =  {expanded = it}
     ) {
         OutlinedTextField(
-            value = selectedValue ?: "",
+            value = selectedValue?.toString() ?: "",
             onValueChange = {},
             placeholder = { Text(text = label) },
             readOnly = true,
@@ -58,7 +58,7 @@ fun DropDownBar(
         ) {
             elements.forEach { element ->
                 DropdownMenuItem(
-                    text = { Text (element) },
+                    text = { Text (element.toString()) },
                     onClick = {
                         onSelectionChanged(element)
                         expanded = false
