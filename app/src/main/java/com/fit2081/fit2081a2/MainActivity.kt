@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStackEntry?.destination?.route
                 val userViewModel: UserViewModel = viewModel()
                 val userLoginViewModel: UserLoginViewModel = viewModel()
+                val patientViewModel: PatientViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -176,6 +177,7 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 context = context,
                                 userLoginViewModel = userLoginViewModel,
+                                patientViewModel = patientViewModel,
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }

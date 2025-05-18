@@ -134,14 +134,14 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-//                    val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
-//                    if (userPhone != null && userPhone == PhoneNumber) {
-//                        Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
+                    val userPhone = csvData[selectedUserID]?.get("PhoneNumber")
+                    if (userPhone != null && userPhone == PhoneNumber) {
+                        Toast.makeText(context, "Login Successful", Toast.LENGTH_LONG).show()
 //                        userViewModel.updateUserID(selectedUserID)
-//                        navController.navigate("questions")
-//                    } else {
-//                        Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
-//                    }
+                        navController.navigate("questions")
+                    } else {
+                        Toast.makeText(context, "Incorrect phone number", Toast.LENGTH_LONG).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
