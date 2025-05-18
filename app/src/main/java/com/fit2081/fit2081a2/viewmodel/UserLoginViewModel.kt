@@ -8,7 +8,7 @@ import com.fit2081.fit2081a2.data.db.entities.UserLogin
 import com.fit2081.fit2081a2.data.repository.UserLoginRepository
 import kotlinx.coroutines.launch
 
-class UserLoginViewModel(application: Application) :AndroidViewModel(application) {
+class UserLoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: UserLoginRepository
 
@@ -17,16 +17,16 @@ class UserLoginViewModel(application: Application) :AndroidViewModel(application
         repository = UserLoginRepository(database.userLoginDao())
     }
 
-    fun login(username: String, password: String, onResult: (UserLogin?) -> Unit) {
+    fun login(userId: Int, password: String, onResult: (UserLogin?) -> Unit) {
         viewModelScope.launch {
-            val user = repository.login(username, password)
+            val user = repository.login(userId, password)
             onResult(user)
         }
     }
 
-    fun register(username: String, password: String, onResult: (Long) -> Unit) {
+    fun register(userId: Int, password: String, onResult: (Long) -> Unit) {
         viewModelScope.launch {
-            val insertedId: Long = repository.register(username, password)
+            val insertedId = repository.register(userId, password)
             onResult(insertedId)
         }
     }

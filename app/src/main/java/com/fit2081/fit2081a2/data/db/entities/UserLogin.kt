@@ -5,9 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "UserLogin")
 data class UserLogin (
-    @PrimaryKey(autoGenerate = true)
-    val userId: Int = 0,  // Auto increment PK
-
-    val username: String,  // User_ID in CSV
+    @PrimaryKey
+    val userId: Int,  // User_ID in CSV, PK
     val passwordHash: String,  // Hash value of password
 )

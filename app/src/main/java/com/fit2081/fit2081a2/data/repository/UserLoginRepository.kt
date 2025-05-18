@@ -19,16 +19,18 @@ class UserLoginRepository(private val userLoginDao: UserLoginDao) {
         }
     }
 
-    suspend fun login(username: String, plainPassword: String): UserLogin? {
+    suspend fun login(userId: Int, plainPassword: String): UserLogin? {
         return withContext(Dispatchers.IO) {
-            userLoginDao.loginWithHashedPassword(username, plainPassword)
+            userLoginDao.loginWithHashedPassword(userId, plainPassword)
         }
     }
 
-    suspend fun register(username: String, password: String): Long {
+    suspend fun register(userId: Int, password: String): Long {
         val hashedPassword = userLoginDao.hashPassword(password)
-        val user = UserLogin(username = username, passwordHash = hashedPassword)
-        return userLoginDao.insert(user)
+        val user = UserLogin(userId = userId, passwordHash = hashedPassword)
+        return withContext(Dispatchers.IO) {
+            userLoginDao.insert(user)
+        }
     }
 
     suspend fun deleteAll() = userLoginDao.deleteAll()
