@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
                 val userViewModel: UserViewModel = viewModel()
                 val userLoginViewModel: UserLoginViewModel = viewModel()
                 val patientViewModel: PatientViewModel = viewModel()
+                val scoreRecordViewModel: ScoreRecordViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -193,8 +194,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 navController = navController,
                                 modifier = Modifier.padding(innerPadding),
-                                currentUserID = userViewModel.userID,
-                                csvData = csvData
+                                scoreRecordViewModel = scoreRecordViewModel,
                             )
                         }
                         composable("insights") {
