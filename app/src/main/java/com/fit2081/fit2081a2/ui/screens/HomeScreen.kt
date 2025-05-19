@@ -1,5 +1,6 @@
 package com.fit2081.fit2081a2.ui.screens
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -31,27 +31,32 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.R
+import com.fit2081.fit2081a2.utils.UserSessionManager
+import com.fit2081.fit2081a2.viewmodel.ScoreRecordViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
     navController: NavController,
     modifier: Modifier,
-    currentUserID: String,
-    csvData: Map<String, Map<String, String>>,
+    scoreRecordViewModel: ScoreRecordViewModel,
 ) {
     val scrollState = rememberScrollState()
-    val currentUserData = csvData[currentUserID]
-    val sex = currentUserData?.get("Sex")
+    val context = LocalContext.current
+    val userId = UserSessionManager.getLoggedInUserId(context)
+    var score by remember { mutableStateOf<Double?>(null) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -71,7 +76,7 @@ fun HomeScreen(
                 color = Color.Gray
             )
             Text(
-                text = currentUserID,
+                text = userId.toString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 48.sp,
             )
@@ -204,21 +209,19 @@ fun HomeScreen(
                     )
                 }
 
-                if (sex != null) {
-                    val score = when (sex) {
-                        "Male" -> currentUserData["HEIFAtotalscoreMale"]
-                        "Female" -> currentUserData["HEIFAtotalscoreFemale"]
-                        else -> "error score"
+                if (userId != null) {
+                    LaunchedEffect(userId) {
+                        score = scoreRecordViewModel.getScoreValue(userId, "heifaScore")
                     }
                     Text(
-                        text = "$score/100",
+                        text = if (score != null) "${score!!}/100" else "Loading...",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Green
                     )
                 } else {
                     Text(
-                        text = "Error Sex",
+                        text = "Error User ID",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Red

@@ -30,4 +30,8 @@ class ScoreRecordViewModel(application: Application) : AndroidViewModel(applicat
             onResult(records)
         }
     }
+
+    suspend fun getScoreValue(userId: Int, scoreField: String): Double? {
+        return repository.getScoreValueByUserIdAndField(userId, scoreField)
+    }
 }

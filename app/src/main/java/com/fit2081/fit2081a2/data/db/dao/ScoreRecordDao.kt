@@ -12,6 +12,15 @@ interface ScoreRecordDao {
     @Query("SELECT * FROM ScoreRecord WHERE patientId = :patientId")
     suspend fun getByPatientId(patientId: Int): List<ScoreRecord>
 
+    @Query("""
+    SELECT sr.*
+    FROM ScoreRecord sr
+    INNER JOIN Patient p ON sr.patientId = p.patientId
+    WHERE p.userId = :userId
+    LIMIT 1
+""")
+    suspend fun getScoreRecordByUserId(userId: Int): ScoreRecord?
+
     @Query("DELETE FROM ScoreRecord")
     suspend fun deleteAll()
 
