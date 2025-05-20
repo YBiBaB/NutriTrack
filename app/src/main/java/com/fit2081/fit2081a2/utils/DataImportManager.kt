@@ -134,5 +134,7 @@ object DataImportManager {
         // 重置 SharedPreferences 状态
         context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             .edit().putBoolean("csv_imported", false).apply()
+
+        UserSessionManager.clearSession(context)
     }
 }
