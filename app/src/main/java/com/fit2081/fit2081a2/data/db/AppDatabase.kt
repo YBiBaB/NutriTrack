@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.fit2081.fit2081a2.data.db.dao.*
 import com.fit2081.fit2081a2.data.db.entities.*
+import com.fit2081.fit2081a2.utils.Converters
 
 @Database(
     entities = [
@@ -18,6 +20,7 @@ import com.fit2081.fit2081a2.data.db.entities.*
     version = 2,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userLoginDao(): UserLoginDao

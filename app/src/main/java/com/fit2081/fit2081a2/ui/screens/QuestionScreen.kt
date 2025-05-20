@@ -1,11 +1,15 @@
 package com.fit2081.fit2081a2.ui.screens
 
 import android.annotation.SuppressLint
+import android.app.TimePickerDialog
 import android.content.Context
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,8 +47,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.UserViewModel
-import com.fit2081.fit2081a2.ui.components.DropDownBar
-import com.fit2081.fit2081a2.ui.components.PersonaModal
+import com.fit2081.fit2081a2.data.db.entities.FoodIntake
+import com.fit2081.fit2081a2.ui.components.*
+import com.fit2081.fit2081a2.utils.UserSessionManager
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
@@ -56,10 +63,11 @@ fun QuestionScreen(
 ) {
     val scrollState = rememberScrollState()
     var showDialog by remember { mutableStateOf(false) }
+    var currentlyShowingKey by remember { mutableStateOf<String?>(null) }
     var modalTitle by remember { mutableStateOf("") }
     var modalImage by remember { mutableStateOf("") }
     var modalMessage by remember { mutableStateOf("") }
-    val userID = userViewModel.userID
+    val userID = UserSessionManager.getLoggedInUserId(context)
 
     var userResponses by rememberSaveable { mutableStateOf(mutableMapOf<String, Any>()) }
 
@@ -67,6 +75,17 @@ fun QuestionScreen(
     var duplicateTimeFields by remember { mutableStateOf(setOf<String>()) }
 
     val foodOptions = listOf("Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds")
+    val selectedFoodCategories = foodOptions.filter { userResponses[it] == true }
+    val foodIntake = userID?.let {
+        FoodIntake(
+            patientId = it,
+            foodCategories = selectedFoodCategories,
+            persona = userResponses["persona"] as? String ?: "",
+            biggestMealTime = userResponses["mealTime"] as? LocalTime ?: LocalTime.of(0, 0),
+            sleepTime = userResponses["sleepTime"] as? LocalTime ?: LocalTime.of(0, 0),
+            wakeUpTime = userResponses["wakeTime"] as? LocalTime ?: LocalTime.of(0, 0),
+        )
+    }
 
     val personaTypes = mapOf(
         "Health Devotee" to mapOf(
@@ -112,11 +131,11 @@ fun QuestionScreen(
         )
     )
 
-    LaunchedEffect(userID) {
-        userViewModel.usersResponsesMap[userID]?.let {
-            userResponses = it.toMutableMap()
-        }
-    }
+//    LaunchedEffect(userID) {
+//        userViewModel.usersResponsesMap[userID.toString()]?.let {
+//            userResponses = it.toMutableMap()
+//        }
+//    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -250,22 +269,55 @@ fun QuestionScreen(
             )
 
             timeQuestions.forEach { (key, question) ->
+                val interactionSource = remember { MutableInteractionSource() }
+                val timeStr = userResponses[key] as? String ?: ""
+                val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                val initialTime = try {
+                    LocalTime.parse(timeStr, formatter)
+                } catch (e: Exception) {
+                    LocalTime.now()
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(question, modifier = Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedTextField(
-                        value = userResponses[key] as? String ?: "",
-                        onValueChange = { userResponses = userResponses.toMutableMap().apply { put(key, it) } },
-                        placeholder = { Text("00:00") },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Outlined.CheckCircle, contentDescription = "Clock Icon")
-                        },
-                        isError = key in missingFields || key in duplicateTimeFields,
-                        modifier = Modifier.width(120.dp),
-                    )
+                    Box {
+                        OutlinedTextField(
+                            value = userResponses[key] as? String ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            placeholder = { Text("00:00") },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Outlined.CheckCircle, contentDescription = "Clock Icon")
+                            },
+                            isError = key in missingFields || key in duplicateTimeFields,
+                            modifier = Modifier.width(120.dp)
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clickable {
+                                    currentlyShowingKey = key
+                                }
+                        )
+                    }
+
+                    if (currentlyShowingKey == key) {
+                        TimePicker(
+                            initialTime = initialTime,
+                            show = true,
+                            onDismissRequest = { currentlyShowingKey = null },
+                            onTimeSelected = { selectedTime ->
+                                userResponses = userResponses.toMutableMap().apply {
+                                    put(key, selectedTime.format(formatter))
+                                }
+                                currentlyShowingKey = null
+                            }
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -294,10 +346,10 @@ fun QuestionScreen(
                     duplicateTimeFields = duplicates
 
                     if (missingFields.isEmpty() && duplicateTimeFields.isEmpty()) {
-                        userViewModel.updateUsersResponsesMap(
-                            userID = userID,
-                            userResponse = userResponses
-                        )
+//                        userViewModel.updateUsersResponsesMap(
+//                            userID = userID.toString(),
+//                            userResponse = userResponses
+//                        )
                         navController.navigate("home")
                     }
                 },
