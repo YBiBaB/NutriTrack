@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class Converters {
     // Convert data from String to Json
@@ -21,7 +22,7 @@ class Converters {
 
     @TypeConverter
     fun fromLocalTime(value: LocalTime?): String? {
-        return value?.toString()  // Default：HH:mm:ss
+        return value?.format(DateTimeFormatter.ofPattern("HH:mm"))
     }
 
     @TypeConverter

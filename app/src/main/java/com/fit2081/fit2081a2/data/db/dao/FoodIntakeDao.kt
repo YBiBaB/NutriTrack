@@ -8,6 +8,9 @@ interface FoodIntakeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(foodIntake: FoodIntake)
 
+    @Update
+    suspend fun update(foodIntake: FoodIntake)
+
     @Query("SELECT * FROM FoodIntake WHERE patientId = :patientId")
     suspend fun getByPatientId(patientId: Int): FoodIntake?
 

@@ -9,6 +9,10 @@ class FoodIntakeRepository(private val foodIntakeDao: FoodIntakeDao) {
         foodIntakeDao.insert(foodIntake)
     }
 
+    suspend fun updateFoodIntake(foodIntake: FoodIntake) {
+        foodIntakeDao.update(foodIntake)
+    }
+
     suspend fun getByPatientId(patientId: Int): FoodIntake? {
         return foodIntakeDao.getByPatientId(patientId)
     }

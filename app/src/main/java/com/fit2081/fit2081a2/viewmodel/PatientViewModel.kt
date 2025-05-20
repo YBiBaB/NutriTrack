@@ -27,6 +27,10 @@ class PatientViewModel(application: Application) : AndroidViewModel(application)
         return repository.getPhoneNumberByUserId(userId)
     }
 
+    suspend fun getPatientIdByUserId(userId: Int): Int? {
+        return repository.getPatientByUserId(userId)?.patientId
+    }
+
     fun getPatientById(id: Int, onResult: (Patient?) -> Unit) {
         viewModelScope.launch {
             val patient = repository.getById(id)

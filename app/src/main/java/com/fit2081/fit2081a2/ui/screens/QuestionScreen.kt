@@ -3,6 +3,7 @@ package com.fit2081.fit2081a2.ui.screens
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,12 @@ import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.data.db.entities.FoodIntake
 import com.fit2081.fit2081a2.ui.components.*
 import com.fit2081.fit2081a2.utils.UserSessionManager
+import com.fit2081.fit2081a2.viewmodel.FoodIntakeViewModel
+import com.fit2081.fit2081a2.viewmodel.PatientViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -57,7 +64,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun QuestionScreen(
     navController: NavController,
-    userViewModel: UserViewModel,
+    patientViewModel: PatientViewModel,
+    foodIntakeViewModel: FoodIntakeViewModel,
     context: Context,
     modifier: Modifier
 ) {
@@ -75,17 +83,6 @@ fun QuestionScreen(
     var duplicateTimeFields by remember { mutableStateOf(setOf<String>()) }
 
     val foodOptions = listOf("Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds")
-    val selectedFoodCategories = foodOptions.filter { userResponses[it] == true }
-    val foodIntake = userID?.let {
-        FoodIntake(
-            patientId = it,
-            foodCategories = selectedFoodCategories,
-            persona = userResponses["persona"] as? String ?: "",
-            biggestMealTime = userResponses["mealTime"] as? LocalTime ?: LocalTime.of(0, 0),
-            sleepTime = userResponses["sleepTime"] as? LocalTime ?: LocalTime.of(0, 0),
-            wakeUpTime = userResponses["wakeTime"] as? LocalTime ?: LocalTime.of(0, 0),
-        )
-    }
 
     val personaTypes = mapOf(
         "Health Devotee" to mapOf(
@@ -131,11 +128,31 @@ fun QuestionScreen(
         )
     )
 
-//    LaunchedEffect(userID) {
-//        userViewModel.usersResponsesMap[userID.toString()]?.let {
-//            userResponses = it.toMutableMap()
-//        }
-//    }
+    LaunchedEffect(userID) {
+        userID?.let { uid ->
+            val patientId = patientViewModel.getPatientIdByUserId(uid)
+            if (patientId != null) {
+                foodIntakeViewModel.getByPatientId(patientId) { existingData ->
+                    existingData?.let { foodIntake ->
+                        // 反向填充 userResponses
+                        userResponses = mutableMapOf<String, Any>().apply {
+                            // 多选题
+                            foodIntake.foodCategories.forEach { put(it, true) }
+
+                            // persona
+                            put("persona", foodIntake.persona)
+
+                            // 时间字段转为字符串
+                            val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                            put("mealTime", foodIntake.biggestMealTime.format(formatter))
+                            put("sleepTime", foodIntake.sleepTime.format(formatter))
+                            put("wakeTime", foodIntake.wakeUpTime.format(formatter))
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -346,11 +363,22 @@ fun QuestionScreen(
                     duplicateTimeFields = duplicates
 
                     if (missingFields.isEmpty() && duplicateTimeFields.isEmpty()) {
-//                        userViewModel.updateUsersResponsesMap(
-//                            userID = userID.toString(),
-//                            userResponse = userResponses
-//                        )
-                        navController.navigate("home")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val patientId = userID?.let { patientViewModel.getPatientIdByUserId(it) }
+                            if (patientId != null) {
+                                val existingRecord = foodIntakeViewModel.repository.getByPatientId(patientId)
+                                withContext(Dispatchers.Main) {
+                                    if (existingRecord == null) {
+                                        insertFoodIntake(userID, patientViewModel, foodIntakeViewModel, userResponses)
+                                    } else {
+                                        updateFoodIntake(userID, patientViewModel, foodIntakeViewModel, userResponses)
+                                    }
+                                    navController.navigate("home")
+                                }
+                            } else {
+                                Log.e("SaveError", "No patient found for userId = $userID")
+                            }
+                        }
                     }
                 },
                 modifier = Modifier
@@ -377,6 +405,93 @@ fun QuestionScreen(
                     fontSize = 22.sp,
                 )
             }
+        }
+    }
+}
+
+fun insertFoodIntake(
+    userID: Int?,
+    patientViewModel: PatientViewModel,
+    foodIntakeViewModel: FoodIntakeViewModel,
+    userResponses: Map<String, Any>
+) {
+    if (userID == null) {
+        Log.e("SaveError", "User ID is null")
+        return
+    }
+
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+
+    val selectedFoodCategories = listOf(
+        "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds"
+    ).filter { userResponses[it] == true }
+
+    val persona = userResponses["persona"] as? String ?: ""
+    val mealTime = (userResponses["mealTime"] as? String)?.let { LocalTime.parse(it, formatter) } ?: LocalTime.of(0, 0)
+    val sleepTime = (userResponses["sleepTime"] as? String)?.let { LocalTime.parse(it, formatter) } ?: LocalTime.of(0, 0)
+    val wakeTime = (userResponses["wakeTime"] as? String)?.let { LocalTime.parse(it, formatter) } ?: LocalTime.of(0, 0)
+
+    // 使用协程处理 Room 调用
+    CoroutineScope(Dispatchers.IO).launch {
+        val patientId = patientViewModel.getPatientIdByUserId(userID)
+        if (patientId != null) {
+            val foodIntake = FoodIntake(
+                patientId = patientId,
+                foodCategories = selectedFoodCategories,
+                persona = persona,
+                biggestMealTime = mealTime,
+                sleepTime = sleepTime,
+                wakeUpTime = wakeTime
+            )
+            foodIntakeViewModel.insertFoodIntake(foodIntake)
+            Log.d("SaveSuccess", "FoodIntake saved: $foodIntake")
+        } else {
+            Log.e("SaveError", "No patient found for userId = $userID")
+        }
+    }
+}
+
+fun updateFoodIntake(
+    userID: Int?,
+    patientViewModel: PatientViewModel,
+    foodIntakeViewModel: FoodIntakeViewModel,
+    userResponses: Map<String, Any>
+) {
+    if (userID == null) {
+        Log.e("SaveError", "User ID is null")
+        return
+    }
+
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+
+    val selectedFoodCategories = listOf(
+        "Fruits", "Vegetables", "Grains", "Red Meat", "Seafood", "Poultry", "Fish", "Egg", "Nuts/Seeds"
+    ).filter { userResponses[it] == true }
+
+    val persona = userResponses["persona"] as? String ?: ""
+    val mealTime = (userResponses["mealTime"] as? String)?.let { LocalTime.parse(it, formatter) } ?: LocalTime.of(0, 0)
+    val sleepTime = (userResponses["sleepTime"] as? String)?.let { LocalTime.parse(it, formatter) } ?: LocalTime.of(0, 0)
+    val wakeTime = (userResponses["wakeTime"] as? String)?.let { LocalTime.parse(it, formatter) } ?: LocalTime.of(0, 0)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        val patientId = patientViewModel.getPatientIdByUserId(userID)
+        if (patientId != null) {
+            val existingRecord = foodIntakeViewModel.repository.getByPatientId(patientId)
+            if (existingRecord != null) {
+                val updatedFoodIntake = existingRecord.copy(
+                    foodCategories = selectedFoodCategories,
+                    persona = persona,
+                    biggestMealTime = mealTime,
+                    sleepTime = sleepTime,
+                    wakeUpTime = wakeTime
+                )
+                foodIntakeViewModel.updateFoodIntake(updatedFoodIntake)
+                Log.d("UpdateSuccess", "FoodIntake updated: $updatedFoodIntake")
+            } else {
+                Log.e("UpdateError", "No existing FoodIntake to update for patientId = $patientId")
+            }
+        } else {
+            Log.e("UpdateError", "No patient found for userId = $userID")
         }
     }
 }

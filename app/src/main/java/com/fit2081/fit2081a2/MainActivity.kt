@@ -79,6 +79,7 @@ class MainActivity : FragmentActivity() {
                 val userLoginViewModel: UserLoginViewModel = viewModel()
                 val patientViewModel: PatientViewModel = viewModel()
                 val scoreRecordViewModel: ScoreRecordViewModel = viewModel()
+                val foodIntakeViewModel: FoodIntakeViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -186,7 +187,8 @@ class MainActivity : FragmentActivity() {
                         composable("questions") {
                             QuestionScreen(
                                 navController = navController,
-                                userViewModel = userViewModel,
+                                patientViewModel = patientViewModel,
+                                foodIntakeViewModel = foodIntakeViewModel,
                                 context = context,
                                 modifier = Modifier.padding(innerPadding)
                             )

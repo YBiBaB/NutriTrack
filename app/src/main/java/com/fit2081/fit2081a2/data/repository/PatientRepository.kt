@@ -13,6 +13,9 @@ class PatientRepository(private val patientDao: PatientDao) {
         return patientDao.getPhoneNumberByUserId(userId)
     }
 
+    suspend fun getPatientByUserId(userId: Int): Patient? {
+        return patientDao.getPatientByUserId(userId)
+    }
 
     suspend fun getById(id: Int): Patient? {
         return patientDao.getById(id)

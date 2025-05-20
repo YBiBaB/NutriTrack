@@ -10,16 +10,22 @@ import kotlinx.coroutines.launch
 
 class FoodIntakeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: FoodIntakeRepository
+    val repository: FoodIntakeRepository
 
     init {
         val db = AppDatabase.getDatabase(application)
         repository = FoodIntakeRepository(db.foodIntakeDao())
     }
 
-    fun insert(foodIntake: FoodIntake) {
+    fun insertFoodIntake(foodIntake: FoodIntake) {
         viewModelScope.launch {
             repository.insert(foodIntake)
+        }
+    }
+
+    fun updateFoodIntake(foodIntake: FoodIntake) {
+        viewModelScope.launch {
+            repository.updateFoodIntake(foodIntake)
         }
     }
 
