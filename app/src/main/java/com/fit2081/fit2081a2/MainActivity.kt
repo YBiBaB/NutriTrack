@@ -203,8 +203,7 @@ class MainActivity : FragmentActivity() {
                         composable("insights") {
                             InsightsScreen(
                                 modifier = Modifier.padding(innerPadding),
-                                currentUserID = userViewModel.userID,
-                                csvData = csvData,
+                                scoreRecordViewModel = scoreRecordViewModel,
                             )
                         }
                         composable("nutriCoach") {

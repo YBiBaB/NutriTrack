@@ -1,11 +1,9 @@
 package com.fit2081.fit2081a2.ui.screens
 
 import android.annotation.SuppressLint
-import android.app.TimePickerDialog
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,7 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.data.db.entities.FoodIntake
 import com.fit2081.fit2081a2.ui.components.*
 import com.fit2081.fit2081a2.utils.UserSessionManager
@@ -286,7 +283,6 @@ fun QuestionScreen(
             )
 
             timeQuestions.forEach { (key, question) ->
-                val interactionSource = remember { MutableInteractionSource() }
                 val timeStr = userResponses[key] as? String ?: ""
                 val formatter = DateTimeFormatter.ofPattern("HH:mm")
                 val initialTime = try {

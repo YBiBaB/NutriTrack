@@ -25,44 +25,66 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fit2081.fit2081a2.utils.UserSessionManager
+import com.fit2081.fit2081a2.viewmodel.ScoreRecordViewModel
 
 @Composable
 fun InsightsScreen(
     modifier: Modifier,
-    currentUserID: String,
-    csvData: Map<String, Map<String, String>>,
+    scoreRecordViewModel: ScoreRecordViewModel,
+//    currentUserID: String,
+//    csvData: Map<String, Map<String, String>>,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
     ) {
         val scrollState = rememberScrollState()
-        val currentUserData = csvData[currentUserID]
-        val sex = currentUserData?.get("Sex")
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val userId = UserSessionManager.getLoggedInUserId(context)
 
         val tagsMap = mapOf(
-            "Vegetables" to listOf("VegetablesHEIFAscoreMale", "VegetablesHEIFAscoreFemale"),
-            "Fruit" to listOf("FruitHEIFAscoreMale", "FruitHEIFAscoreFemale"),
-            "Grains & Cereals" to listOf("GrainsandcerealsHEIFAscoreMale", "GrainsandcerealsHEIFAscoreFemale"),
-            "Whole Grains" to listOf("WholegrainsHEIFAscoreMale", "WholegrainsHEIFAscoreFemale"),
-            "Meat & Alternatives" to listOf("MeatandalternativesHEIFAscoreMale", "MeatandalternativesHEIFAscoreFemale"),
-            "Dairy" to listOf("DairyandalternativesHEIFAscoreMale", "DairyandalternativesHEIFAscoreFemale"),
-            "Sodium" to listOf("SodiumHEIFAscoreMale", "SodiumHEIFAscoreFemale"),
-            "Alcohol" to listOf("AlcoholHEIFAscoreMale", "AlcoholHEIFAscoreFemale"),
-            "Water" to listOf("WaterHEIFAscoreMale", "WaterHEIFAscoreFemale"),
-            "Sugar" to listOf("SugarHEIFAscoreMale" ,"SugarHEIFAscoreFemale"),
-            "Saturated Fat" to listOf("SaturatedFatHEIFAscoreMale", "SaturatedFatHEIFAscoreFemale"),
-            "UnsaturatedFat" to listOf("UnsaturatedFatHEIFAscoreMale", "UnsaturatedFatHEIFAscoreFemale"),
-            "Discretionary" to listOf("DiscretionaryHEIFAscoreMale", "DiscretionaryHEIFAscoreFemale"),
+            "Vegetables" to "VegetablesHEIFAscore",
+            "Fruit" to "FruitHEIFAscore",
+            "Grains & Cereals" to "GrainsandcerealsHEIFAscore",
+            "Whole Grains" to "WholegrainsHEIFAscore",
+            "Meat & Alternatives" to "MeatandalternativesHEIFAscore",
+            "Dairy" to "DairyandalternativesHEIFAscore",
+            "Sodium" to "SodiumHEIFAscore",
+            "Alcohol" to "AlcoholHEIFAscore",
+            "Water" to "WaterHEIFAscore",
+            "Sugar" to "SugarHEIFAscore" ,
+            "Saturated Fat" to "SaturatedFatHEIFAscore",
+            "UnsaturatedFat" to "UnsaturatedFatHEIFAscore",
+            "Discretionary" to "DiscretionaryHEIFAscore",
         )
-        val totalMarkTags = listOf("HEIFAtotalscoreMale", "HEIFAtotalscoreFemale")
+        val totalScoreField = "HEIFAscore"
+        val scoreStateMap = remember { mutableStateMapOf<String, Double?>() }
+
+        // Load all scores async
+        LaunchedEffect(userId) {
+            if (userId != null) {
+                tagsMap.values.forEach { field ->
+                    val value = scoreRecordViewModel.getScoreValue(userId, field)
+                    scoreStateMap[field] = value
+                }
+                val total = scoreRecordViewModel.getScoreValue(userId, totalScoreField)
+                scoreStateMap[totalScoreField] = total
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -72,10 +94,8 @@ fun InsightsScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
-            tagsMap.forEach { (tag, fieldNames) ->
-                val fieldName = if (sex == "Male") fieldNames[0] else fieldNames[1]
-
-                val score = currentUserData?.get(fieldName)?.toIntOrNull() ?: 0
+            tagsMap.forEach { (tag, fieldName) ->
+                val score = scoreStateMap[fieldName]?.toFloat() ?: 0f
                 val progress = score / 10f
 
                 Row(
@@ -116,9 +136,8 @@ fun InsightsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val fieldName = if (sex == "Male") totalMarkTags[0] else totalMarkTags[1]
-            val score = currentUserData?.get(fieldName)?.toIntOrNull() ?: 0
-            val progress = score / 100f
+            val score = scoreStateMap[totalScoreField] ?: 0.0
+            val progress = (score / 100.0).coerceIn(0.0, 1.0)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -126,7 +145,7 @@ fun InsightsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 LinearProgressIndicator(
-                    progress = progress.coerceIn(0f, 1f),
+                    progress = progress.toFloat(),
                     modifier = Modifier
                         .weight(3f)
                         .height(8.dp)

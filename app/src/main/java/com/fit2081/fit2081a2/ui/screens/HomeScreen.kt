@@ -44,8 +44,6 @@ import androidx.navigation.NavController
 import com.fit2081.fit2081a2.R
 import com.fit2081.fit2081a2.utils.UserSessionManager
 import com.fit2081.fit2081a2.viewmodel.ScoreRecordViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
