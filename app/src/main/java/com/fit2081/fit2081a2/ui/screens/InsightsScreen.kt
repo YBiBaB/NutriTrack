@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +43,6 @@ import com.fit2081.fit2081a2.viewmodel.ScoreRecordViewModel
 fun InsightsScreen(
     modifier: Modifier,
     scoreRecordViewModel: ScoreRecordViewModel,
-//    currentUserID: String,
-//    csvData: Map<String, Map<String, String>>,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -53,7 +50,6 @@ fun InsightsScreen(
     ) {
         val scrollState = rememberScrollState()
         val context = LocalContext.current
-        val scope = rememberCoroutineScope()
         val userId = UserSessionManager.getLoggedInUserId(context)
 
         val tagsMap = mapOf(

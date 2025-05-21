@@ -33,10 +33,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.fit2081.fit2081a2.UserViewModel
 import com.fit2081.fit2081a2.ui.components.DropDownBar
 import com.fit2081.fit2081a2.utils.UserSessionManager
-import com.fit2081.fit2081a2.utils.readCSVFile
 import com.fit2081.fit2081a2.viewmodel.UserLoginViewModel
 
 @Composable
