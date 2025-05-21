@@ -24,11 +24,18 @@ class PatientViewModel(application: Application) : AndroidViewModel(application)
     }
 
     suspend fun getPhoneNumberByUserId(userId: Int): String? {
-        return repository.getPhoneNumberByUserId(userId)
+        return repository.getPatientByUserId(userId)?.phoneNumber
     }
 
     suspend fun getPatientIdByUserId(userId: Int): Int? {
         return repository.getPatientByUserId(userId)?.patientId
+    }
+
+    suspend fun getPatientNameByUserId(userId: Int): List<String?>? {
+        val patient = repository.getPatientByUserId(userId)
+        val firstname = patient?.firstName
+        val lastname = patient?.lastName
+        return listOf(firstname, lastname)
     }
 
     fun getPatientById(id: Int, onResult: (Patient?) -> Unit) {
