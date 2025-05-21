@@ -1,8 +1,6 @@
 package com.fit2081.fit2081a2
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,24 +16,23 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.fit2081.fit2081a2.data.db.AppDatabase
 import com.fit2081.fit2081a2.data.repository.*
 import com.fit2081.fit2081a2.ui.theme.FIT2081A2Theme
 import com.fit2081.fit2081a2.ui.screens.*
 import com.fit2081.fit2081a2.ui.components.*
+import com.fit2081.fit2081a2.ui.screens.settings.*
 import com.fit2081.fit2081a2.utils.*
 import com.fit2081.fit2081a2.viewmodel.*
 import kotlinx.coroutines.launch
@@ -72,10 +69,8 @@ class MainActivity : FragmentActivity() {
             FIT2081A2Theme {
                 val navController = rememberNavController()
                 val context = LocalContext.current
-                val csvData = readCSVFile(context, "data.csv")
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-                val userViewModel: UserViewModel = viewModel()
                 val userLoginViewModel: UserLoginViewModel = viewModel()
                 val patientViewModel: PatientViewModel = viewModel()
                 val scoreRecordViewModel: ScoreRecordViewModel = viewModel()
@@ -85,23 +80,21 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
                         val showTopBar = when (currentRoute) {
-                            "welcome" -> false
-                            "login" -> false
                             "questions" -> true
-                            "home" -> false
                             "insights" -> true
+                            "settings/main" -> true
                             else -> false
                         }
 
                         val title = when (currentRoute) {
                             "questions" -> "Food intake Questionnaire"
                             "insights" -> "Insights: Food Score"
+                            "settings/main" -> "Settings"
                             else -> ""
                         }
 
                         val showBackButton = when (currentRoute) {
                             "questions" -> true
-                            "insights" -> false
                             else -> false
                         }
 
@@ -143,7 +136,7 @@ class MainActivity : FragmentActivity() {
                                 label = "Settings",
                                 outlinedIcon = Icons.Outlined.Settings,
                                 filledIcon = Icons.Filled.Settings,
-                                route = "settings"
+                                route = "settings/main"
                             ),
                         )
 
@@ -209,8 +202,33 @@ class MainActivity : FragmentActivity() {
                         composable("nutriCoach") {
                             NutriCoachScreen()
                         }
-                        composable("settings") {
-                            SettingsScreen()
+
+                        navigation(
+                            startDestination = "settings/main",
+                            route = "settings"
+                        ) {
+                            composable("settings/main") {
+                                SettingsScreen(
+                                    userLoginViewModel = userLoginViewModel,
+                                    patientViewModel = patientViewModel,
+                                    navController = navController,
+                                    modifier = Modifier.padding(innerPadding)
+                                )
+                            }
+                            composable("settings/username") {
+                                EditNameScreen(
+                                    navController = navController,
+                                    patientViewModel = patientViewModel,
+                                    modifier = Modifier.padding(innerPadding)
+                                )
+                            }
+                            composable("settings/account/password") {
+                                ChangePasswordScreen(
+                                    navController = navController,
+                                    userLoginViewModel = userLoginViewModel,
+                                    modifier = Modifier.padding(innerPadding)
+                                )
+                            }
                         }
                     }
                 }
@@ -223,25 +241,8 @@ class MainActivity : FragmentActivity() {
             "home",
             "insights",
             "nutriCoach",
-            "settings",
+            "settings/main",
         )
-    }
-}
-
-@SuppressLint("MutableCollectionMutableState")
-class UserViewModel : ViewModel() {
-    var userID by mutableStateOf("")
-        private set
-
-    fun updateUserID(newID: String) {
-        userID = newID
-    }
-
-    var usersResponsesMap: MutableMap<String, MutableMap<String, Any>> = mutableMapOf()
-        private set
-
-    fun updateUsersResponsesMap(userID: String, userResponse: MutableMap<String, Any>) {
-        usersResponsesMap[userID] = userResponse
     }
 }
 
