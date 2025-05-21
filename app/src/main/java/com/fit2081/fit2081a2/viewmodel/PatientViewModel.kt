@@ -38,6 +38,12 @@ class PatientViewModel(application: Application) : AndroidViewModel(application)
         return listOf(firstname, lastname)
     }
 
+    fun updatePatientName(userId: Int, firstName: String, lastName: String) {
+        viewModelScope.launch {
+            repository.updatePatientName(userId, firstName, lastName)
+        }
+    }
+
     fun getPatientById(id: Int, onResult: (Patient?) -> Unit) {
         viewModelScope.launch {
             val patient = repository.getById(id)

@@ -83,6 +83,7 @@ class MainActivity : FragmentActivity() {
                             "questions" -> true
                             "insights" -> true
                             "settings/main" -> true
+                            "settings/username" -> true
                             else -> false
                         }
 
@@ -90,16 +91,19 @@ class MainActivity : FragmentActivity() {
                             "questions" -> "Food intake Questionnaire"
                             "insights" -> "Insights: Food Score"
                             "settings/main" -> "Settings"
+                            "settings/username" -> "Update your name"
                             else -> ""
                         }
 
                         val showBackButton = when (currentRoute) {
                             "questions" -> true
+                            "settings/username" ->true
                             else -> false
                         }
 
                         val backRoute = when (currentRoute) {
                             "questions" -> "login"
+                            "settings/username" -> "settings/main"
                             else -> null
                         }
 

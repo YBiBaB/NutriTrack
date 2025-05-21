@@ -18,6 +18,9 @@ interface PatientDao {
     @Query("SELECT * FROM Patient")
     suspend fun getAll(): List<Patient>
 
+    @Query("UPDATE Patient SET firstName = :firstName, lastName = :lastName WHERE userId = :userId")
+    suspend fun updatePatientName(userId: Int, firstName: String, lastName: String)
+
     @Query("DELETE FROM Patient")
     suspend fun deleteAll()
 }

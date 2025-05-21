@@ -48,12 +48,17 @@ fun SettingsScreen(
     val context = LocalContext.current
     val userId = UserSessionManager.getLoggedInUserId(context)
     val patientName = remember { mutableStateListOf<String>() }
+    val phoneNumber = remember { mutableStateOf("") }
 
     LaunchedEffect(userId) {
         val nameList = userId?.let { patientViewModel.getPatientNameByUserId(it) }
         patientName.clear()
         if (nameList != null) {
             patientName.addAll(nameList.filterNotNull())
+        }
+        val phoneNum = userId?.let { patientViewModel.getPhoneNumberByUserId(it) }
+        if (phoneNum != null) {
+            phoneNumber.value = phoneNum
         }
     }
 
@@ -92,7 +97,7 @@ fun SettingsScreen(
 
             ReadOnlyItem(
                 icon = Icons.Outlined.Phone,
-                label = "phoneNumber"
+                label = phoneNumber.value
             )
 
             Spacer(modifier = Modifier.height(12.dp))

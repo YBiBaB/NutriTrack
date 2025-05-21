@@ -21,5 +21,9 @@ class PatientRepository(private val patientDao: PatientDao) {
         return patientDao.getAll()
     }
 
+    suspend fun updatePatientName(userId: Int, firstName: String, lastName: String) {
+        patientDao.updatePatientName(userId, firstName, lastName)
+    }
+
     suspend fun deleteAll() = patientDao.deleteAll()
 }
