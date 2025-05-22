@@ -60,6 +60,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Retrofit with Scalar Converter
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
     // Reflect
     implementation(kotlin("reflect"))
 
@@ -68,6 +75,10 @@ dependencies {
 
     // Time picker
     implementation ("com.google.android.material:material:1.12.0")
+
+    // HTTP Request
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
 
     // Room DB
     val room_version = "2.6.1"

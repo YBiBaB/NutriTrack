@@ -18,7 +18,7 @@ import java.time.LocalTime
 )
 data class FoodIntake(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,                        // A_I PK
+    val intakeId: Int = 0,                  // A_I PK
 
     val patientId: Int,                     // FK of Patient
     val foodCategories: List<String>,       // Muti answer question (food categories)

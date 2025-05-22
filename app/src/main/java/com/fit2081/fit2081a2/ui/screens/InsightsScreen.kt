@@ -36,12 +36,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.fit2081.fit2081a2.utils.UserSessionManager
 import com.fit2081.fit2081a2.viewmodel.ScoreRecordViewModel
 
 @Composable
 fun InsightsScreen(
     modifier: Modifier,
+    navController: NavController,
     scoreRecordViewModel: ScoreRecordViewModel,
 ) {
     Surface(
@@ -185,7 +187,9 @@ fun InsightsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = {},
+                onClick = {
+                    navController.navigate("nutriCoach")
+                },
                 modifier = Modifier
                     .width(200.dp)
                     .height(50.dp)

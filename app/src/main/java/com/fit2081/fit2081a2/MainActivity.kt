@@ -82,28 +82,34 @@ class MainActivity : FragmentActivity() {
                         val showTopBar = when (currentRoute) {
                             "questions" -> true
                             "insights" -> true
+                            "nutriCoach" -> true
                             "settings/main" -> true
                             "settings/username" -> true
+                            "settings/password" -> true
                             else -> false
                         }
 
                         val title = when (currentRoute) {
                             "questions" -> "Food intake Questionnaire"
                             "insights" -> "Insights: Food Score"
+                            "nutriCoach" -> "NutriCoach"
                             "settings/main" -> "Settings"
-                            "settings/username" -> "Update your name"
+                            "settings/username" -> "Update Your Name"
+                            "settings/password" -> "Reset Your Password"
                             else -> ""
                         }
 
                         val showBackButton = when (currentRoute) {
                             "questions" -> true
                             "settings/username" ->true
+                            "settings/password" -> true
                             else -> false
                         }
 
                         val backRoute = when (currentRoute) {
                             "questions" -> "login"
                             "settings/username" -> "settings/main"
+                            "settings/password" -> "settings/main"
                             else -> null
                         }
 
@@ -200,11 +206,16 @@ class MainActivity : FragmentActivity() {
                         composable("insights") {
                             InsightsScreen(
                                 modifier = Modifier.padding(innerPadding),
+                                navController = navController,
                                 scoreRecordViewModel = scoreRecordViewModel,
                             )
                         }
                         composable("nutriCoach") {
-                            NutriCoachScreen()
+                            NutriCoachScreen(
+                                navController = navController,
+                                scoreRecordViewModel = scoreRecordViewModel,
+                                modifier = Modifier.padding(innerPadding),
+                            )
                         }
 
                         navigation(
@@ -227,7 +238,7 @@ class MainActivity : FragmentActivity() {
                                 )
                             }
                             composable("settings/account/password") {
-                                ChangePasswordScreen(
+                                ResetPasswordScreen(
                                     navController = navController,
                                     userLoginViewModel = userLoginViewModel,
                                     modifier = Modifier.padding(innerPadding)

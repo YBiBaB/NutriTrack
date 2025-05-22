@@ -17,7 +17,7 @@ import com.fit2081.fit2081a2.utils.Converters
         FoodIntake::class,
         DietRecord::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

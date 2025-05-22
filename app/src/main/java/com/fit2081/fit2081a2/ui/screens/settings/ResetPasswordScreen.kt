@@ -1,9 +1,18 @@
 package com.fit2081.fit2081a2.ui.screens.settings
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.DrawerDefaults.shape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
@@ -12,7 +21,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,31 +33,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fit2081.fit2081a2.utils.UserSessionManager
-import com.fit2081.fit2081a2.viewmodel.PatientViewModel
+import com.fit2081.fit2081a2.viewmodel.UserLoginViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
-fun EditNameScreen(
+fun ResetPasswordScreen(
     navController: NavController,
-    patientViewModel: PatientViewModel,
-    modifier: Modifier
+    userLoginViewModel: UserLoginViewModel,
+    modifier: Modifier,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val userId = UserSessionManager.getLoggedInUserId(context)
-    val patientName = remember { mutableStateListOf<String>() }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    var firstName = remember { mutableStateOf(patientName.getOrNull(0) ?: "") }
-    var lastName = remember { mutableStateOf(patientName.getOrNull(1) ?: "") }
-
-
-    LaunchedEffect(userId) {
-        val nameList = userId?.let { patientViewModel.getPatientNameByUserId(it) }
-        patientName.clear()
-        if (nameList != null) {
-            patientName.addAll(nameList.filterNotNull())
-        }
-    }
+    var oldPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -60,7 +61,7 @@ fun EditNameScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "First name",
+            "Old password",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             modifier = Modifier.align(Alignment.Start),
@@ -69,18 +70,18 @@ fun EditNameScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = firstName.value,
+            value = oldPassword,
             onValueChange = {
-                firstName.value = it
+                oldPassword = it
             },
-            label = { Text("Enter your first name") },
+            label = { Text("Enter your original password") },
             modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "Last name",
+            "New Password",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             modifier = Modifier.align(Alignment.Start),
@@ -89,11 +90,31 @@ fun EditNameScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = lastName.value,
+            value = newPassword,
             onValueChange = {
-                lastName.value = it
+                newPassword = it
             },
-            label = { Text("Enter your last name") },
+            label = { Text("Enter your new password") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            "Confirm Password",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier.align(Alignment.Start),
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = newPassword,
+            onValueChange = {
+                newPassword = it
+            },
+            label = { Text("Confirm your password") },
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -105,12 +126,28 @@ fun EditNameScreen(
         ) {
             Button(
                 onClick = {
-                    errorMessage = null
-                    if (userId != null && firstName.value != "" && lastName.value != "") {
-                        patientViewModel.updatePatientName(userId, firstName.value, lastName.value)
-                        navController.navigate("settings/main")
-                    } else {
-                        errorMessage = "First name and last name cannot be empty"
+                    if (userId != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            withContext(Dispatchers.Main) {
+                                if (newPassword.isEmpty() || newPassword.length < 6) {
+                                    Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_LONG).show()
+                                    return@withContext
+                                }
+                                if (newPassword != confirmPassword) {
+                                    Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
+                                    return@withContext
+                                }
+                            }
+                            userLoginViewModel.login(userId, oldPassword) { isSuccess ->
+                                if (isSuccess) {
+                                    userLoginViewModel.updatePassword(userId, newPassword)
+                                    Toast.makeText(context, "Reset Successful", Toast.LENGTH_LONG).show()
+                                    navController.navigate("settings/main")
+                                } else {
+                                    Toast.makeText(context, "Incorrect password", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
                     }
                 },
                 modifier = Modifier
@@ -118,7 +155,8 @@ fun EditNameScreen(
                     .height(60.dp)
                 ,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5F29BD)),
+                    containerColor = Color(0xFF5F29BD)
+                ),
                 shape = RoundedCornerShape(12.dp),
             ) {
                 Text(
