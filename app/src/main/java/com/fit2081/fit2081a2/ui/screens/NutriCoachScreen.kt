@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +46,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.fit2081.fit2081a2.network.genAI.GenAIViewModel
+import com.fit2081.fit2081a2.network.genAI.UiState
 import com.fit2081.fit2081a2.utils.UserSessionManager
 import com.fit2081.fit2081a2.viewmodel.FruitViewModel
 import com.fit2081.fit2081a2.viewmodel.PatientViewModel
@@ -60,6 +64,7 @@ import com.fit2081.fit2081a2.viewmodel.ScoreRecordViewModel
 fun NutriCoachScreen(
     navController: NavController,
     scoreRecordViewModel: ScoreRecordViewModel,
+    genAIViewModel: GenAIViewModel,
     modifier: Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -71,6 +76,8 @@ fun NutriCoachScreen(
     val viewModel: FruitViewModel = viewModel()
     val fruitInfo = viewModel.fruit
     val isLoading = viewModel.isLoading
+    val uiState by genAIViewModel.uiState.collectAsState()
+    var result by remember { mutableStateOf("") }
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -91,7 +98,7 @@ fun NutriCoachScreen(
         ) {
             if (fruitHeifaScore.value != null) {
                 if (fruitHeifaScore.value!! >= 5) {
-                    Text("你的水果摄入非常健康！", style = MaterialTheme.typography.titleMedium)
+                    Text("Your fruit intake is very healthy!", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     AsyncImage(
                         model = "https://picsum.photos/300",
@@ -185,7 +192,11 @@ fun NutriCoachScreen(
                     Divider(modifier = Modifier.padding(vertical = 16.dp))
 
                     Button(
-                        onClick = {},
+                        onClick = {
+                            genAIViewModel.sendPrompt(
+                                "Generate a short encouraging message to help someone improve their fruit intake."
+                            )
+                        },
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .height(50.dp)
@@ -194,20 +205,38 @@ fun NutriCoachScreen(
                             containerColor = Color(0xFF5F29BD)
                         )
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Send,
-                            contentDescription = "AI Icon",
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        if (uiState is UiState.Loading) {
+                            // 显示加载圈
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                strokeWidth = 2.dp,
+                                modifier = Modifier
+                                    .size(16.dp)
+                            )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
 
-                        Text(
-                            "Motivational Message(AI)",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                        )
+                            Text(
+                                "Generating...",
+                                color = Color.White,
+                                fontSize = 16.sp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Send,
+                                contentDescription = "AI Icon",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                "Motivational Message (AI)",
+                                color = Color.White,
+                                fontSize = 18.sp
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -215,12 +244,24 @@ fun NutriCoachScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f) // 填满剩余空间
+                            .weight(1f)
                             .verticalScroll(rememberScrollState())
                             .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     ) {
-                        Text(text = "aiMessage")
+                        var textColor = MaterialTheme.colorScheme.onSurface
+                        if (uiState is UiState.Error) {
+                            textColor = MaterialTheme.colorScheme.error
+                            result = (uiState as UiState.Error).errorMessage
+                        } else if (uiState is UiState.Success) {
+                            result = (uiState as UiState.Success).outputString
+                        }
+
+                        Text(
+                            text = result,
+                            textAlign = TextAlign.Start,
+                            color = textColor,
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))

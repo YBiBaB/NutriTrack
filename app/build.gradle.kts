@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val genAiApiKey: String = project.findProperty("GENAI_API_KEY") as? String ?: ""
 android {
     namespace = "com.fit2081.fit2081a2"
     compileSdk = 35
@@ -15,6 +16,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "GENAI_API_KEY", "\"$genAiApiKey\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -60,11 +63,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    // Retrofit with Scalar Converter
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    //GenAI
+    implementation(libs.generativeai)
 
+    // Async Request
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Reflect

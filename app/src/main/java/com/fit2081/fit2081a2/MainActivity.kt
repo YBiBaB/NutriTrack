@@ -29,6 +29,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.fit2081.fit2081a2.data.db.AppDatabase
 import com.fit2081.fit2081a2.data.repository.*
+import com.fit2081.fit2081a2.network.genAI.GenAIViewModel
 import com.fit2081.fit2081a2.ui.theme.FIT2081A2Theme
 import com.fit2081.fit2081a2.ui.screens.*
 import com.fit2081.fit2081a2.ui.components.*
@@ -75,6 +76,7 @@ class MainActivity : FragmentActivity() {
                 val patientViewModel: PatientViewModel = viewModel()
                 val scoreRecordViewModel: ScoreRecordViewModel = viewModel()
                 val foodIntakeViewModel: FoodIntakeViewModel = viewModel()
+                val genAIViewModel: GenAIViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -214,6 +216,7 @@ class MainActivity : FragmentActivity() {
                             NutriCoachScreen(
                                 navController = navController,
                                 scoreRecordViewModel = scoreRecordViewModel,
+                                genAIViewModel = genAIViewModel,
                                 modifier = Modifier.padding(innerPadding),
                             )
                         }
