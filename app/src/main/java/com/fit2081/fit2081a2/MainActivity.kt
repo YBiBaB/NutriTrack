@@ -77,6 +77,7 @@ class MainActivity : FragmentActivity() {
                 val scoreRecordViewModel: ScoreRecordViewModel = viewModel()
                 val foodIntakeViewModel: FoodIntakeViewModel = viewModel()
                 val genAIViewModel: GenAIViewModel = viewModel()
+                val nutriCoachTipViewModel: NutriCoachTipViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -216,6 +217,8 @@ class MainActivity : FragmentActivity() {
                             NutriCoachScreen(
                                 navController = navController,
                                 scoreRecordViewModel = scoreRecordViewModel,
+                                patientViewModel = patientViewModel,
+                                nutriCoachTipViewModel = nutriCoachTipViewModel,
                                 genAIViewModel = genAIViewModel,
                                 modifier = Modifier.padding(innerPadding),
                             )

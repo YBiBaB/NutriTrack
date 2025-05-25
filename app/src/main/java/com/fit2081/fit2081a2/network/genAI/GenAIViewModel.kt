@@ -46,4 +46,8 @@ class GenAIViewModel : ViewModel() {
             }
         }
     }
+
+    fun clearResult() {
+        _uiState.value = UiState.Initial
+    }
 }

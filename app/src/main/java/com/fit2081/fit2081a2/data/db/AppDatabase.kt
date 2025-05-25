@@ -15,9 +15,10 @@ import com.fit2081.fit2081a2.utils.Converters
         Patient::class,
         ScoreRecord::class,
         FoodIntake::class,
-        DietRecord::class
+        DietRecord::class,
+        NutriCoachTip::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -28,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun scoreRecordDao(): ScoreRecordDao
     abstract fun foodIntakeDao(): FoodIntakeDao
     abstract fun dietRecordDao(): DietRecordDao
+    abstract fun NutriCoachTipDao(): NutriCoachTipDao
 
     companion object {
         @Volatile

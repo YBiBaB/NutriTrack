@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "NutriCoachTips",
+    tableName = "NutriCoachTip",
     foreignKeys = [
         ForeignKey(
             entity = Patient::class,
@@ -18,6 +18,9 @@ import androidx.room.PrimaryKey
 data class NutriCoachTip (
     @PrimaryKey(autoGenerate = true)
     val tipId: Int = 0,
+
+    val patientId: Int,
+
     val tipContent: String,
     val scoreSnapshot: String?,
     val dietSnapshot: String?,
