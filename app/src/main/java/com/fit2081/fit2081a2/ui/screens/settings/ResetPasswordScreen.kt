@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DrawerDefaults.shape
 import androidx.compose.material.OutlinedButton
@@ -29,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -74,8 +77,12 @@ fun ResetPasswordScreen(
             onValueChange = {
                 oldPassword = it
             },
-            label = { Text("Enter your original password") },
+            label = { androidx.compose.material3.Text("Enter your original password") },
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password
+            ),
+            visualTransformation = PasswordVisualTransformation(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -94,8 +101,18 @@ fun ResetPasswordScreen(
             onValueChange = {
                 newPassword = it
             },
-            label = { Text("Enter your new password") },
+            label = { androidx.compose.material3.Text("Enter your new password") },
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password
+            ),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = newPassword.isNotEmpty() && newPassword.length < 6,
+            supportingText = {
+                if (newPassword.isNotEmpty() && newPassword.length < 6) {
+                    androidx.compose.material3.Text("Password length must not less than 6")
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -110,12 +127,22 @@ fun ResetPasswordScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = newPassword,
+            value = confirmPassword,
             onValueChange = {
-                newPassword = it
+                confirmPassword = it
             },
-            label = { Text("Confirm your password") },
+            label = { androidx.compose.material3.Text("Re-enter your password") },
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password
+            ),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = confirmPassword.isNotEmpty() && confirmPassword != newPassword,
+            supportingText = {
+                if (confirmPassword.isNotEmpty() && confirmPassword != newPassword) {
+                    androidx.compose.material3.Text("Passwords do not match")
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))

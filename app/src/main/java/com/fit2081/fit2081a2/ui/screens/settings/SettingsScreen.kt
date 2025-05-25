@@ -1,6 +1,7 @@
 package com.fit2081.fit2081a2.ui.screens.settings
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -132,11 +133,27 @@ fun SettingsScreen(
             )
 
             ClickableItem(
+                icon = Icons.Outlined.Lock,
+                label = "Reset password",
+                onClick = {navController.navigate("settings/password")},
+                showArrow = true
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ClickableItem(
+                icon = Icons.Outlined.Person,
+                label = "Clinician Login",
+                onClick = { Toast.makeText(context, "To be Continued...", Toast.LENGTH_LONG).show()},
+                showArrow = true
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ClickableItem(
                 icon = Icons.Outlined.ExitToApp,
                 label = "Log out",
                 onClick = {
-//                    UserSessionManager.clearSession(context)
-//                    navController.navigate("welcome")
                     showModal= true
                 },
                 showArrow = true

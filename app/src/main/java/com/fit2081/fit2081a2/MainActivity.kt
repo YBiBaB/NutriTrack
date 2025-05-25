@@ -44,6 +44,7 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Import CSV to DB
         lifecycleScope.launch {
             DataImportManager.importIfNeeded(
                 context = this@MainActivity,
@@ -55,6 +56,11 @@ class MainActivity : FragmentActivity() {
             )
         }
 
+        // Delete all data from DB and reset sharedpreference.
+        // If you want to reset database, you should do following steps:
+        // 1. comment code above uncomment the following code
+        // 2. Rebuild and run this program
+        // 3. Comment following code and uncomment import code and rebuild
 //        lifecycleScope.launch {
 //            DataImportManager.resetImportStatus(
 //                context = this@MainActivity,
@@ -243,7 +249,7 @@ class MainActivity : FragmentActivity() {
                                     modifier = Modifier.padding(innerPadding)
                                 )
                             }
-                            composable("settings/account/password") {
+                            composable("settings/password") {
                                 ResetPasswordScreen(
                                     navController = navController,
                                     userLoginViewModel = userLoginViewModel,
